@@ -1,14 +1,13 @@
 console.log("Client script loaded");
 
-var url;										/* the URL to contact the signaling server 				*/
-url = window.location.href;
+var url = window.location.href;					/* the URL to contact the signaling server 				*/
 if (/Electron/i.test(navigator.userAgent)) {	/* for the Desktop-app, the URL must be indicated 		*/
 	url = "https://travail-de-bachelor.herokuapp.com";
 } else if ( ! /Chrome|CriOS|Edge|Edg|EdgiOS/.test(navigator.userAgent)) {
 	alert("You need to use Google Chrome or Microsoft Edge to use this application");
 } else {
 	if ( ! url.contains("localhost"))
-		if ( ! url.slice(0,5).contains("https")) {
+		if ( ! url.slice(0,5).includes("https")) {
 			url = "https://" + url.slice(0,7);	/* on the navigator, the URL is redirected to https		*/
 			a = create('a',"");
 			a.href = url;
