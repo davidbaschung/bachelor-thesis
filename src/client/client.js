@@ -8,7 +8,7 @@ if (/Electron/i.test(navigator.userAgent)) {	/* for the Desktop-app, the URL mus
 } else {
 	if ( ! url.includes("localhost"))
 		if ( ! url.slice(0,5).includes("https")) {
-			url = "https://" + url.slice(0,7);	/* on the navigator, the URL is redirected to https		*/
+			url = "https://" + url.slice(7,url.length);	/* on the navigator, the URL is redirected to https		*/
 			a = create('a',"");
 			a.href = url;
 			a.click();
