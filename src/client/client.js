@@ -1,21 +1,19 @@
 console.log("Client script loaded");
 
-var url;									/* the URL to contact the signaling server 				*/
-url = "http://localhost:4001";
-if (url==undefined) {
-	if (/Electron/i.test(navigator.userAgent)) {/* for the Desktop-app, the URL must be indicated 		*/
-		url = "https://travail-de-bachelor.herokuapp.com";
-	} else if ( ! /Chrome|CriOS|Edge|Edg|EdgiOS/.test(navigator.userAgent)) {
-		alert("You need to use Google Chrome or Microsoft Edge to use this application");
-	} else {
-		url = window.location.href; 			/* on the navigator, the URL is redirected to https		*/
+var url;										/* the URL to contact the signaling server 				*/
+url = window.location.href;
+if (/Electron/i.test(navigator.userAgent)) {	/* for the Desktop-app, the URL must be indicated 		*/
+	url = "https://travail-de-bachelor.herokuapp.com";
+} else if ( ! /Chrome|CriOS|Edge|Edg|EdgiOS/.test(navigator.userAgent)) {
+	alert("You need to use Google Chrome or Microsoft Edge to use this application");
+} else {
+	if ( ! url.contains("localhost"))
 		if ( ! url.slice(0,5).contains("https")) {
-			url = "https://" + url.slice(0,7);
+			url = "https://" + url.slice(0,7);	/* on the navigator, the URL is redirected to https		*/
 			a = create('a',"");
 			a.href = url;
 			a.click();
 		}
-	}
 }
 
 var socket = io.connect(url);
