@@ -6,7 +6,7 @@ if (/Electron/i.test(navigator.userAgent)) {	/* for the Desktop-app, the URL mus
 } else if ( ! /Chrome|CriOS|Edge|Edg|EdgiOS/.test(navigator.userAgent)) {
 	alert("You need to use Google Chrome or Microsoft Edge to use this application");
 } else {
-	if ( ! url.contains("localhost"))
+	if ( ! url.includes("localhost"))
 		if ( ! url.slice(0,5).includes("https")) {
 			url = "https://" + url.slice(0,7);	/* on the navigator, the URL is redirected to https		*/
 			a = create('a',"");
