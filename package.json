@@ -1,0 +1,87 @@
+{
+  "name": "travail-de-bachelor",
+  "productName": "P2P Secure File Transfer",
+  "version": "1.0.0",
+  "description": "This peer-to-peer application allows two remote users to send files securely in real time. Both authenticate each other by inputing a passphrase.",
+  "main": "src/electron/main.js",
+  "scripts": {
+    "server": "node src/server/main.js",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish",
+    "lint": ""
+  },
+  "keywords": [
+    "P2P",
+    "Peer-to-peer",
+    "Peer to peer",
+    "Secure",
+    "Data",
+    "File",
+    "Transfer",
+    "Exchange",
+    "WebRTC"
+  ],
+  "author": {
+    "name": "David Baschung",
+    "email": "davidbaschung@bluewin.ch"
+  },
+  "license": "MIT",
+  "config": {
+    "forge": {
+      "packagerConfig": {},
+      "makers": [
+        {
+          "name": "@electron-forge/maker-squirrel",
+          "config": {
+            "name": "travail_de_bachelor"
+          }
+        },
+        {
+          "name": "@electron-forge/maker-zip",
+          "platforms": [
+            "darwin"
+          ]
+        },
+        {
+          "name": "@electron-forge/maker-deb",
+          "config": {}
+        },
+        {
+          "name": "@electron-forge/maker-rpm",
+          "config": {}
+        }
+      ]
+    }
+  },
+  "dependencies": {
+    "electron-squirrel-startup": "^1.0.0",
+    "express": "^4.17.1",
+    "jquery": "^3.6.0",
+    "node-forge": "^0.10.0",
+    "react": "^17.0.2",
+    "socket.io": "^4.0.2"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^6.0.0-beta.54",
+    "@electron-forge/maker-deb": "^6.0.0-beta.54",
+    "@electron-forge/maker-rpm": "^6.0.0-beta.54",
+    "@electron-forge/maker-squirrel": "^6.0.0-beta.54",
+    "@electron-forge/maker-zip": "^6.0.0-beta.54",
+    "electron": "^12.0.7",
+    "eslint": "^7.29.0"
+  },
+  "build": {
+    "productName": "P2P Secure File Transfer",
+    "appId": "P2P",
+    "win": {
+      "target": [
+        "portable"
+      ]
+    },
+    "portable": {
+      "artifactName": "P2P Secure File Transfer"
+    }
+  }
+}

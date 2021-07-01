@@ -1,0 +1,152 @@
+:root {
+  --frontColor:#d8efff;
+  --backgroundColor:#000340;
+  --lightBackgroundColor:#153170;
+  --lightBackgroundColorHover:#304985;
+  --lightGreen:#44ff55;
+  --linkHighlight:rgb(50, 255, 255);
+}
+
+body{
+  font-family: "Arial";
+  color: var(--frontColor);
+  background-color: var(--backgroundColor);
+}
+
+div.main {
+  display:block;
+  text-align:center;
+  margin:12px;
+}
+
+div.view {
+  margin:4px;
+}
+
+div.outerZone {
+  border-radius:10px;
+}
+
+#mainTitle {
+  border-radius:20px;
+  padding:20px;
+  text-shadow:0 0 1px white;
+  box-shadow:0 0 2px blue, 0 3px 12px black;
+  background-color:var(--lightBackgroundColor);
+}
+#mainTitle:hover {
+  background-color:var(--lightBackgroundColorHover);
+}
+
+div.titleZone{
+  border: 1px solid var(--frontColor);
+  border-radius:inherit;
+  padding:4px;
+  margin:inherit;
+  font-weight:bold;
+}
+
+div.innerZone {
+  padding-left:10px;
+  padding-right:10px;
+  margin:15px;
+}
+
+*.grid {
+  display:grid;
+  grid-template-columns: auto 100px;
+}
+
+input{
+  min-width:162px;
+}
+
+*.pagewidth{
+  margin-left:10%;
+  margin-right:10%;
+}
+
+*[bold] {
+  font-weight: bold;
+}
+
+*[margin] {
+  margin:10px;
+  display:inline-block;
+}
+
+*[large] {
+  width:100%;
+}
+
+*.drop{
+  display:block;
+  overflow:auto;
+  min-width:50px;
+  min-height:50px;
+  height:200px;
+  margin-left:auto;
+  margin-right:auto;
+  margin-top:20px;
+  margin-bottom:20px;
+  border-radius:15px;
+  padding:15px;
+  box-shadow:0 0 10px lightgreen, 0 5px 20px black;
+  background-color: var(--lightGreen);
+  color:var(--backgroundColor);
+}
+*.drop:hover {
+  background-color: aquamarine;
+}
+*.drop.dragOver {
+  background-color:navajowhite;
+}
+*.drop.disabled {
+  background-color:lightgrey;
+  color:grey;
+}
+
+li{
+  text-align:left;
+}
+
+button{
+  font-size:18px;
+  padding:10px;
+}
+
+button.inputButton {
+  font-size:14px;
+  padding:1px;
+}
+
+label.highlight, div.highlight {
+  border-radius:15px;
+  padding:20px;
+  color:var(--backgroundColor);
+}
+
+label.smallHighlight, div.smallHighlight, a.smallHighlight {
+  border-radius:5px;
+  padding:5px;
+  color:var(--backgroundColor);
+}
+
+label.yellow, div.yellow{
+  background-color:rgb(255, 255, 180);
+}
+
+label.green, div.green, button.green {
+  background-color:var(--lightGreen);
+}
+
+label.red, div.red {
+  background-color:salmon;
+}
+
+a.highlightedLink {
+  border-radius: 3px;
+  text-shadow: 0 0 5px white;
+  box-shadow: 0 0 4px var(--linkHighlight);
+  background-color:var(--linkHighlight);
+}

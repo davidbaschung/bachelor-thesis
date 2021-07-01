@@ -1,0 +1,29 @@
+<div class="outerZone">
+    <div class="titleZone">
+        <label>Sender</label>
+    </div>
+    <div class="innerZone">
+        <label class="pagewidth">Drag files (or click) on the <a style="color:var(--lightGreen)" bold>box</a> below to send them to someone.</label>
+        <div id='drop1' class='drop' onclick="browseFiles()" ondragover="dragOverAction(event)" ondragleave="dragLeaveAction(event)" ondrop="dropAction(event)">
+            <ul id="filesList">
+            </ul>
+        </div>
+        <button id="validate" onclick="validateButton()" margin disabled="true">Validate</button>
+        <button id="reset" onclick="resetButton()" margin>Reset</button>
+        <div id="receiverCodeContainer">
+            <h4>
+                Code for the receiver(s) : <br /><br />
+                <label id="receiverCode" bold>[ ]</label>
+            </h4>
+            <div></div>
+        </div>
+        <br />
+        <label>Send this code to the receiver(s).</label>
+        <div class="innerZone">
+            <label class="gridLabel">Input the receiver's code before he launches the download's. Remain connected </label>
+                <input id="senderCodeInput" type="text" placeholder="code-from-the-receiver" large onclick="$('senderCodeInput').value=''" />
+        </div>
+        <br />
+        <div><label id="senderFeedback"></label></div>
+    </div>
+</div>
