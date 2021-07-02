@@ -193,8 +193,8 @@ function iceConnectionStateChange_A(event) {
 	}
 }
 
-socket.on("restartSignaling", receiverID) {
+socket.on("restartSignaling", function (receiverID) {
 	console.log("Socket : restarting signaling");
 	currentReceiverID = receiverID;
 	startSignaling(true);
-}
+});
