@@ -139,18 +139,18 @@ io.on("connection", function (socket) {
         if (transferMetaData == undefined) return;
         if (isHost) transferMetaData.roomHostSocket = socket.id;
         else {
-            function checkIfHostReconnected(count) {
-                if (transferMetaData.roomHostSocket.connected == true) {
-                    socket.to(transferMetaData.roomHostSocket).emit("restartSignaling", socket.id);
-                } else {
-                    if (count<600)
-                        sleep(1000).then(() => {
-                            checkIfHostReconnected(++count);
-                        });
-                }
-            }
-
             checkIfHostReconnected(0);
         }
     });
+
+    function checkIfHostReconnected(count) {
+        if (transferMetaData.roomHostSocket.connected == true) {
+            socket.to(transferMetaData.roomHostSocket).emit("restartSignaling", socket.id);
+        } else {
+            if (count<600)
+                sleep(1000).then(() => {
+                    checkIfHostReconnected(++count);
+                });
+        }
+    }
 });

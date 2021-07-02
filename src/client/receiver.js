@@ -192,6 +192,7 @@ function closeReceivingDC() {
 		sleep(5000).then(() => {
 			if (receiverConnection.iceConnectionState == "failed" ||  receiverConnection.iceConnectionState == "disconnected") {
 				sleep(1000).then(() => {
+					console.log("RTC+Socket : Restoring connection");
 					socket = io.connect(url);
 					socket.emit("restoreConnection",false);
 				});

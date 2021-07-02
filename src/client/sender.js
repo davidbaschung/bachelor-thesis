@@ -182,10 +182,11 @@ function closeSendingDC() {
  */
 function iceConnectionStateChange_A(event) {
 	console.log(event);
-	console.log("RTC : ICE state : ",event.target.connectionState);
+	console.log("RTC : ICE state : ",senderConnection.iceConnectionState);
 	if (senderConnection.iceConnectionState == "failed" ||  senderConnection.iceConnectionState == "disconnected") {
 		sleep(5000).then(() => {
 			if (senderConnection.iceConnectionState == "failed" ||  senderConnection.iceConnectionState == "disconnected") {
+				console.log("RTC+Socket : Restoring connection");
 				socket = io.connect(url);
 				socket.emit("restoreConnection",true);
 			}
