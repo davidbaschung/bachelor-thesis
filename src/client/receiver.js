@@ -188,9 +188,9 @@ function closeReceivingDC() {
  function iceConnectionStateChange_B(event) {
 	console.log(event)
 	console.log("RTC : ICE state : ",event.target.connectionState);
-	if (senderConnection.iceConnectionState == "failed" ||  senderConnection.iceConnectionState == "disconnected") {
+	if (receiverConnection.iceConnectionState == "failed" ||  receiverConnection.iceConnectionState == "disconnected") {
 		sleep(5000).then(() => {
-			if (senderConnection.iceConnectionState == "failed" ||  senderConnection.iceConnectionState == "disconnected") {
+			if (senderConnection.iceConnectionState == "failed" ||  receiverConnection.iceConnectionState == "disconnected") {
 				sleep(1000).then(() => {
 					socket = io.connect(url);
 					socket.emit("restoreConnection",false);

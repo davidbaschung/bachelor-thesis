@@ -178,10 +178,10 @@ function closeSendingDC() {
 
 /**
  * TODO
- * @param {*} event 
+ * @param {Event} event - state change event, with connectivity informations.
  */
 function iceConnectionStateChange_A(event) {
-	console.log(event)
+	console.log(event);
 	console.log("RTC : ICE state : ",event.target.connectionState);
 	if (senderConnection.iceConnectionState == "failed" ||  senderConnection.iceConnectionState == "disconnected") {
 		sleep(5000).then(() => {
