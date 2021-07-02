@@ -2,7 +2,6 @@ console.log("server script loaded");
 const expressModule = require("express");
 const socketModule = require("socket.io");
 const utilsModule = require("./utils.js");
-const clientUtilsModule = require("../client/utils.js");
 const app = expressModule();
 app.use(expressModule.static("src/client"));
 app.get("/", function (request, response) {

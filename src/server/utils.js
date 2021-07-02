@@ -6,6 +6,15 @@ forge.options.usePureJavaScript = true;
 exports.getCredentials = getCredentials;
 
 /**
+ * Asynchronous way to pause the execution
+ * @param {number} timeMillis - waiting time in milliseconds
+ * @returns A promise that the caller must "await"
+ */
+ async function asyncSleep(timeMillis) {
+    return new Promise((resolve => setTimeout(resolve,timeMillis)));
+}
+
+/**
  * Reads the local X.509 stored certificate. Creates them if non-existent.
  * @param {String} folderPath - path of the stored key and certificate
  * @returns the key and certificates that can be used in an https server
