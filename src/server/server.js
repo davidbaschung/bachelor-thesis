@@ -133,23 +133,32 @@ io.on("connection", function (socket) {
         socket.to(senderID).emit("transferStatus", newStatus);
     })
 
-    socket.on("restoreConnection", function (isHost) {
-        console.log("Restoring connection. Socket ID : ",socket.ID," , isHost : ",isHost);
-        var transferMetaData = transferMetaDataMap.get(inputedCode);
-        if (transferMetaData == undefined) return;
-        if (isHost) transferMetaData.roomHostSocket = socket.id;
-        else {
-            checkIfHostReconnected(0);
+    socket.on("restoreConnection", function (receiverCode, isHost) {
+        console.log("Restoring connection. Code : ",receiverCode," , isHost : ",isHost);
+        var transferMetaData = transferMetaDataMap.get(receiverCode);
+        if (transferMetaData == undefined) {
+            console.log("not metadata for given receiverCode");
+            return;
+        }
+        if (isHost) {
+            transferMetaData.roomHostSocket = socket.id;
+            console.log("host rejoined");
+        } else {
+            console.log("receiver will check host presence");
+            checkIfHostReconnected(transferMetaData, 0);
         }
     });
 
-    function checkIfHostReconnected(count) {
+    function checkIfHostReconnected(transferMetaData, count) {
+        console.log("check");
         if (transferMetaData.roomHostSocket.connected == true) {
-            socket.to(transferMetaData.roomHostSocket).emit("restartSignaling", socket.id);
+            console.log("receiver restarts signaling");
+            socket.to(transferMetaData.roomHostSocket.id).emit("restartSignaling", socket.id);
+            socket.emit("updateSocket", transferMetaData.roomHostSocket.id);
         } else {
-            if (count<20)
-                asyncSleep(1000).then(() => {
-                    checkIfHostReconnected(++count);
+            if (count<600)
+                new Promise((r => setTimeout(r,1000))).then(() => {
+                    checkIfHostReconnected(transferMetaData, ++count);
                 });
         }
     }

@@ -3,6 +3,7 @@ console.log("Receiver script loaded");
 var receiverConnection;	/* Receiver RTCPeerConnection 			*/
 var receiverCertificate;/* Receiver Authentication Certificate	*/
 var currentSenderID;	/* Sender Socket ID  					*/
+var senderCode;			/* The code derived from the certificate*/
 var inputedReceiverCode;/* Receiver Code, stored from the input	*/
 var receiverDataChannel;/* Receiver P2P DataChannel 			*/
 
@@ -37,7 +38,6 @@ socket.on("codeRefused", function() {
  * Changes the [OK] button to a [download] button
  */
 socket.on("codeAccepted", function(transferMetaData) {
-	var senderCode;
 	RTCPeerConnection.generateCertificate(encryptionAlgorithm).then(function(certificate) {
 		receiverCertificate = certificate;
 		senderCode = hashToPassphrase(certificate.getFingerprints()[0].value);
@@ -194,9 +194,14 @@ function closeReceivingDC() {
 				asyncSleep(1000).then(() => {
 					console.log("RTC+Socket : Restoring connection");
 					socket = io.connect(url);
-					socket.emit("restoreConnection",false);
+					socket.emit("restoreConnection",inputedReceiverCode,false);
+					console.log(getCode(true));
 				});
 			}
 		})
 	}
 }
+
+socket.on("updateSocket", function(senderID) {
+	currentSenderID = senderID;
+});

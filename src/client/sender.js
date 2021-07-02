@@ -1,7 +1,8 @@
 console.log("Sender script loaded");
 
 var senderConnection;	/* Sender RTCPeerConnection 			*/
-var senderCertificate;	/* Sender Authentication Certificate	*/
+var senderCertificate;	/* Sender authentication certificate	*/
+var receiverCode;		/* The code derived from the certificate*/
 var currentReceiverID;	/* Receiver Socket ID  					*/
 var inputedSenderCode;	/* Sender Code, stored from the page	*/
 var senderDataChannel;	/* Sender P2P DataChannel 				*/
@@ -22,7 +23,6 @@ function launchClientSender() {
             "size" : f.size
         }
     }
-	var receiverCode;
 	RTCPeerConnection.generateCertificate(encryptionAlgorithm).then(function(certificates) {
 		senderCertificate = certificates;
 		receiverCode = hashToPassphrase(certificates.getFingerprints()[0].value);
@@ -105,7 +105,7 @@ function startSignaling(iceRestart) {
  */
 socket.on("answerSDP", function (answerSDP) {
 	console.log("Socket : Received SDP answer");
-	inputedSenderCode = getSenderCode();
+	inputedSenderCode = getCode(false);
 	// inputedSenderCode = "fakeWrongCodeForCerticateTesting";
 	if (hashToPassphrase(getSDPFingerprint(answerSDP)) != inputedSenderCode) {
 		setFeedback(false, "The receiver's authentication certificate is not valid or the code is wrong.","red");
@@ -188,7 +188,7 @@ function iceConnectionStateChange_A(event) {
 			if (senderConnection.iceConnectionState == "failed" ||  senderConnection.iceConnectionState == "disconnected") {
 				console.log("RTC+Socket : Restoring connection");
 				socket = io.connect(url);
-				socket.emit("restoreConnection",true);
+				socket.emit("restoreConnection", receiverCode, true);
 			}
 		})
 	}
@@ -197,5 +197,6 @@ function iceConnectionStateChange_A(event) {
 socket.on("restartSignaling", function (receiverID) {
 	console.log("Socket : restarting signaling");
 	currentReceiverID = receiverID;
-	startSignaling(true);
+	senderConnection.restartIce();
+	// startSignaling(true);
 });

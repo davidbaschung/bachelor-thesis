@@ -90,9 +90,14 @@ function setReceiverCodeButtonAction(action) {
     }
 }
 
-/* Gets the sender code in the yellow label */
-function getSenderCode() {
-    return $("senderCodeInput").value;
+/**
+ * Gets the receiver/sender code in the code input field
+ * @param {boolean} receiver
+ * @returns the code string
+ */
+function getCode(receiver) {
+    label = receiver ? $("receiverCodeInput") : $("senderCodeInput");
+    return label.value;
 }
 
 /* Sets information notices as HTML in the receiver feedback panel */
