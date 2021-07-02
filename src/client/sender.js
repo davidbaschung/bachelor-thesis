@@ -74,11 +74,14 @@ socket.on("initDownload", function() {
 	senderDataChannel.onclose = closeSendingDC;
 	senderDataChannel.onmessage = (message) => {console.log("DataChannel : message : ", message.data)};
 	senderDataChannel.onerror = (error) => {console.log("DataChannel : ERROR : ", error); };
-	startSignaling();
+	startSignaling(false);
 });
 
-/* Starts the signaling process, sends an SDP offer. Called on receiver request. */
-function startSignaling() {
+/**
+ * Starts the signaling process, sends an SDP offer. Called on receiver request.
+ * @param {boolean} iceRestart - reconnection restart flag after connection loss or failure.
+ */
+function startSignaling(iceRestart) {
 	senderConnection.createOffer(
 		function (offerSDP) {
 			console.log(senderConnection.getConfiguration().certificates[0]);
@@ -87,6 +90,9 @@ function startSignaling() {
 		},
 		function (error) {
 			console.log(error);
+		},
+		options = {
+			"iceRestart" : iceRestart,
 		}
 	)
 }
@@ -148,6 +154,10 @@ socket.on("transferStatus", function (newStatus) {
 	updateTransferStatus(false, newStatus+"% uploaded", true);
 	if (newStatus.includes("100"))
 		setResetButtonLabel("reset");
+	if (senderConnection.iceConnectionState == "failed" ||
+		senderConnection.iceConnectionState == "disconnected") {
+			
+	}
 });
 
 /* Start files sending. Called by the DataChannel on opening. */
