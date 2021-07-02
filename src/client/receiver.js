@@ -88,13 +88,15 @@ socket.on("offerSDP", function (offerSDP, senderID, iceRestart) {
 	console.log("SDP : ", offerSDP);
 	console.log("fingerprint : ",getSDPFingerprint(offerSDP));
 	currentSenderID = senderID;
-	receiverConnection = new RTCPeerConnection({
-		iceServers: iceServers,
-		certificates: [receiverCertificate]
-		});
-	receiverConnection.onicecandidate = onIceCandidateRTC_B;
-	receiverConnection.oniceconnectionstatechange = iceConnectionStateChange_B;
-	receiverConnection.ondatachannel = receiveDataChannelRTC;
+	if ( ! iceRestart) {
+		receiverConnection = new RTCPeerConnection({
+			iceServers: iceServers,
+			certificates: [receiverCertificate]
+			});
+		receiverConnection.onicecandidate = onIceCandidateRTC_B;
+		receiverConnection.oniceconnectionstatechange = iceConnectionStateChange_B;
+		receiverConnection.ondatachannel = receiveDataChannelRTC;
+	}
 	receiverConnection.setRemoteDescription(offerSDP);
 	receiverConnection.createAnswer(
 		function (answerSDP) {
@@ -183,7 +185,7 @@ function closeReceivingDC() {
 
 /**
  * TODO
- * @param {*} event 
+ * @param {Event} event 
  */
  function iceConnectionStateChange_B(event) {
 	console.log(event)
@@ -195,7 +197,6 @@ function closeReceivingDC() {
 					console.log("RTC+Socket : Restoring connection");
 					socket = io.connect(url);
 					socket.emit("restoreConnection",inputedReceiverCode,false);
-					console.log(getCode(true));
 				});
 			}
 		})
