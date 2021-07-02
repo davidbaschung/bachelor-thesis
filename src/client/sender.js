@@ -63,7 +63,7 @@ socket.on("initDownload", function() {
 		certificates: [senderCertificate]
 	});
 	senderConnection.onicecandidate = onIceCandidateRTC_A;
-	senderConnection.oniceconnectionstatechange = (event) => console.log("RTC : ICE state : ",event.target.connectionState);
+	senderConnection.oniceconnectionstatechange = iceConnectionStateChange_A;
 	var senderDataChannelOptions = {
 		ordered:true,
 		binaryType:"arraybuffer",
@@ -74,7 +74,7 @@ socket.on("initDownload", function() {
 	senderDataChannel.onclose = closeSendingDC;
 	senderDataChannel.onmessage = (message) => {console.log("DataChannel : message : ", message.data)};
 	senderDataChannel.onerror = (error) => {console.log("DataChannel : ERROR : ", error); };
-	startSignaling(false);
+	startSignaling(true);
 });
 
 /**
@@ -154,10 +154,6 @@ socket.on("transferStatus", function (newStatus) {
 	updateTransferStatus(false, newStatus+"% uploaded", true);
 	if (newStatus.includes("100"))
 		setResetButtonLabel("reset");
-	if (senderConnection.iceConnectionState == "failed" ||
-		senderConnection.iceConnectionState == "disconnected") {
-			
-	}
 });
 
 /* Start files sending. Called by the DataChannel on opening. */
@@ -178,4 +174,27 @@ function closeSendingDC() {
 	senderConnection = null;
 	currentReceiverID = null;
 	senderDataChannel = null;
+}
+
+/**
+ * TODO
+ * @param {*} event 
+ */
+function iceConnectionStateChange_A(event) {
+	console.log(event)
+	console.log("RTC : ICE state : ",event.target.connectionState);
+	if (senderConnection.iceConnectionState == "failed" ||  senderConnection.iceConnectionState == "disconnected") {
+		sleep(5000).then(() => {
+			if (senderConnection.iceConnectionState == "failed" ||  senderConnection.iceConnectionState == "disconnected") {
+				socket = io.connect(url);
+				socket.emit("restoreConnection",true);
+			}
+		})
+	}
+}
+
+socket.on("restartSignaling", receiverID) {
+	console.log("Socket : restarting signaling");
+	currentReceiverID = receiverID;
+	startSignaling(true);
 }

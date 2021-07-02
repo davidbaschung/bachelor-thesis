@@ -93,7 +93,7 @@ socket.on("offerSDP", function (offerSDP, senderID) {
 		certificates: [receiverCertificate]
 		});
 	receiverConnection.onicecandidate = onIceCandidateRTC_B;
-	receiverConnection.oniceconnectionstatechange = (event) => console.log("RTC : ICE state : ",event.target.connectionState);
+	receiverConnection.oniceconnectionstatechange = iceConnectionStateChange_B;
 	receiverConnection.ondatachannel = receiveDataChannelRTC;
 	receiverConnection.setRemoteDescription(offerSDP);
 	receiverConnection.createAnswer(
@@ -179,4 +179,23 @@ function closeReceivingDC() {
 	receiverConnection = null;
 	currentSenderID = null;
 	receiverDataChannel = null;
+}
+
+/**
+ * TODO
+ * @param {*} event 
+ */
+ function iceConnectionStateChange_B(event) {
+	console.log(event)
+	console.log("RTC : ICE state : ",event.target.connectionState);
+	if (senderConnection.iceConnectionState == "failed" ||  senderConnection.iceConnectionState == "disconnected") {
+		sleep(5000).then(() => {
+			if (senderConnection.iceConnectionState == "failed" ||  senderConnection.iceConnectionState == "disconnected") {
+				sleep(1000).then(() => {
+					socket = io.connect(url);
+					socket.emit("restoreConnection",false);
+				});
+			}
+		})
+	}
 }

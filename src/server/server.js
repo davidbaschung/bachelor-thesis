@@ -132,4 +132,25 @@ io.on("connection", function (socket) {
     socket.on("transferStatus", function (newStatus, senderID) {
         socket.to(senderID).emit("transferStatus", newStatus);
     })
+
+    socket.on("restoreConnection", function (isHost) {
+        console.log("Restoring connection. Socket ID : ",socket.ID," , isHost : ",isHost);
+        var transferMetaData = transferMetaDataMap.get(inputedCode);
+        if (transferMetaData == undefined) return;
+        if (isHost) transferMetaData.roomHostSocket = socket.id;
+        else {
+            function checkIfHostReconnected(count) {
+                if (transferMetaData.roomHostSocket.connected == true) {
+                    socket.to(transferMetaData.roomHostSocket).emit("restartSignaling", socket.id);
+                } else {
+                    if (count<600)
+                        sleep(1000).then(() => {
+                            checkIfHostReconnected(++count);
+                        });
+                }
+            }
+
+            checkIfHostReconnected(0);
+        }
+    });
 });
