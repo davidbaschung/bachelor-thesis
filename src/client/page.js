@@ -139,7 +139,7 @@ function createLink(file, index) {
 function updateTransferStatus(receiver, text, instantaneous) {
     if ( ! updateStatus && ! instantaneous && receiver) return false;
     updateStatus = false;
-    sleep(500).then( function() {
+    asyncSleep(500).then( function() {
         updateStatus = true;
     });
     var tag = receiver ? "receiverStatus" : "senderStatus";

@@ -1,7 +1,8 @@
 console.log("server script loaded");
 const expressModule = require("express");
 const socketModule = require("socket.io");
-const utilsModule = require("./utils/utils.js");
+const utilsModule = require("./utils.js");
+const clientUtilsModule = require("../client/utils.js");
 const app = expressModule();
 app.use(expressModule.static("src/client"));
 app.get("/", function (request, response) {
@@ -147,8 +148,8 @@ io.on("connection", function (socket) {
         if (transferMetaData.roomHostSocket.connected == true) {
             socket.to(transferMetaData.roomHostSocket).emit("restartSignaling", socket.id);
         } else {
-            if (count<600)
-                sleep(1000).then(() => {
+            if (count<20)
+                asyncSleep(1000).then(() => {
                     checkIfHostReconnected(++count);
                 });
         }

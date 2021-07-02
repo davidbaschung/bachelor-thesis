@@ -123,7 +123,7 @@ socket.on("answerSDP", function (answerSDP) {
  */
 async function onIceCandidateRTC_A(event) {
 	while (senderConnection.remoteDescription==undefined)
-		await sleep(50);
+		await asyncSleep(50);
 	console.log("RTC : IceCandidateA created, it will be sent");
 	if (event.candidate) {
 		socket.emit("IceCandidateA", event.candidate, currentReceiverID);
@@ -184,7 +184,7 @@ function iceConnectionStateChange_A(event) {
 	console.log(event);
 	console.log("RTC : ICE state : ",senderConnection.iceConnectionState);
 	if (senderConnection.iceConnectionState == "failed" ||  senderConnection.iceConnectionState == "disconnected") {
-		sleep(5000).then(() => {
+		asyncSleep(5000).then(() => {
 			if (senderConnection.iceConnectionState == "failed" ||  senderConnection.iceConnectionState == "disconnected") {
 				console.log("RTC+Socket : Restoring connection");
 				socket = io.connect(url);

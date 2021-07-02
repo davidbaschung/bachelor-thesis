@@ -45,7 +45,7 @@ function sendFileAsync(file) {
     reader.onload = async function(event) {
         var result = event.target.result;
         while (senderDataChannel.bufferedAmount + result.byteLength > maxBufferedAmount)
-            await sleep(50);
+            await asyncSleep(50);
         senderDataChannel.send(result);
         offset += result.byteLength;
         if (offset < file.size) {
