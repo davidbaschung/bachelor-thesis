@@ -78,7 +78,7 @@ socket.on('abortDownload', function() {
  * Creates immediately a peer connection and pass it the SDP offer with the certificate.
  * Sends an SDP answer back.
  */
-socket.on("offerSDP", function (offerSDP, senderID) {
+socket.on("offerSDP", function (offerSDP, senderID, iceRestart) {
 	console.log("Socket : Received SDP offer");
 	// inputedReceiverCode = "fakeWrongCodeForCerticateTesting";
 	if (hashToPassphrase(getSDPFingerprint(offerSDP)) != inputedReceiverCode) {

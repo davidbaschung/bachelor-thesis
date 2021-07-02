@@ -18,6 +18,7 @@ app.get("/", function (request, response) {
 class TransferMetaData {
     constructor(roomHostSocket, files) {
         this.roomHostSocket = roomHostSocket;
+        this.hostReconnected = false;   /* flag activated by host in case of connection failure */
         this.files = files;
         this.size = 0;
         for (var f of files) {
@@ -95,9 +96,9 @@ io.on("connection", function (socket) {
     });
 
     /* An SDP offer is relayed from the sender to the receiver */
-    socket.on("offerSDP", function (offerSDP, receiverID) {
+    socket.on("offerSDP", function (offerSDP, receiverID, iceRestart) {
         var senderID = socket.id;
-        socket.to(receiverID).emit("offerSDP", offerSDP, senderID);
+        socket.to(receiverID).emit("offerSDP", offerSDP, senderID, iceRestart);
         console.log("Offer SDP : \nsender id : ",socket.id," receiver id : ",receiverID);
     });
 
@@ -136,13 +137,11 @@ io.on("connection", function (socket) {
     socket.on("restoreConnection", function (receiverCode, isHost) {
         console.log("Restoring connection. Code : ",receiverCode," , isHost : ",isHost);
         var transferMetaData = transferMetaDataMap.get(receiverCode);
-        if (transferMetaData == undefined) {
-            console.log("not metadata for given receiverCode");
-            return;
-        }
+        if (transferMetaData == undefined) return;
         if (isHost) {
-            transferMetaData.roomHostSocket = socket.id;
-            console.log("host rejoined");
+            transferMetaData.roomHostSocket = socket;
+            transferMetaData.hostReconnected = true;
+            console.log(transferMetaDataMap.get(receiverCode).roomHostSocket.id);
         } else {
             console.log("receiver will check host presence");
             checkIfHostReconnected(transferMetaData, 0);
@@ -150,8 +149,9 @@ io.on("connection", function (socket) {
     });
 
     function checkIfHostReconnected(transferMetaData, count) {
-        console.log("check");
-        if (transferMetaData.roomHostSocket.connected == true) {
+        console.log("check socket : ",transferMetaData.roomHostSocket.id);
+        if (transferMetaData.hostReconnected == true) {
+            transferMetaData.hostReconnected = false;
             console.log("receiver restarts signaling");
             socket.to(transferMetaData.roomHostSocket.id).emit("restartSignaling", socket.id);
             socket.emit("updateSocket", transferMetaData.roomHostSocket.id);

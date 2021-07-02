@@ -74,7 +74,7 @@ socket.on("initDownload", function() {
 	senderDataChannel.onclose = closeSendingDC;
 	senderDataChannel.onmessage = (message) => {console.log("DataChannel : message : ", message.data)};
 	senderDataChannel.onerror = (error) => {console.log("DataChannel : ERROR : ", error); };
-	startSignaling(true);
+	startSignaling(false);
 });
 
 /**
@@ -84,9 +84,10 @@ socket.on("initDownload", function() {
 function startSignaling(iceRestart) {
 	senderConnection.createOffer(
 		function (offerSDP) {
+			console.log(offerSDP);
 			console.log(senderConnection.getConfiguration().certificates[0]);
 			senderConnection.setLocalDescription(offerSDP);
-			socket.emit("offerSDP", offerSDP, currentReceiverID);
+			socket.emit("offerSDP", offerSDP, currentReceiverID, iceRestart);
 		},
 		function (error) {
 			console.log(error);
@@ -126,6 +127,8 @@ async function onIceCandidateRTC_A(event) {
 		await asyncSleep(50);
 	console.log("RTC : IceCandidateA created, it will be sent");
 	if (event.candidate) {
+		
+        console.log("candidate : ",event.candidate);
 		socket.emit("IceCandidateA", event.candidate, currentReceiverID);
 	} else {
 		console.log ("RTC : End-of-candidates");
@@ -198,5 +201,5 @@ socket.on("restartSignaling", function (receiverID) {
 	console.log("Socket : restarting signaling");
 	currentReceiverID = receiverID;
 	senderConnection.restartIce();
-	// startSignaling(true);
+	startSignaling(true);
 });
