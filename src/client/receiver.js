@@ -117,7 +117,7 @@ socket.on("receiverAuthenticationFailed", function() {
 	failed.setAttribute("id", "receiverAuthenticationFailed");
 	failed.setAttribute("class", "red smallHighlight");
 	failed.innerHTML = "Your authentication failed. Did you communicate your code to the sender?";
-	$("receiverFeedback").appendChild(failed);
+	getFeedback(true).appendChild(failed);
 })
 
 /** Delivers an ICE candidate from the receiver to the local connection. */
@@ -190,7 +190,7 @@ function closeReceivingDC() {
 	console.log("RTC : ICE state : ",event.target.connectionState);
 	if (receiverConnection.iceConnectionState == "failed" ||  receiverConnection.iceConnectionState == "disconnected") {
 		sleep(5000).then(() => {
-			if (senderConnection.iceConnectionState == "failed" ||  receiverConnection.iceConnectionState == "disconnected") {
+			if (receiverConnection.iceConnectionState == "failed" ||  receiverConnection.iceConnectionState == "disconnected") {
 				sleep(1000).then(() => {
 					socket = io.connect(url);
 					socket.emit("restoreConnection",false);

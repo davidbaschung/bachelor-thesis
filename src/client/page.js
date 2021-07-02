@@ -105,6 +105,11 @@ function setFeedback(receiver, message, highlightColor) {
         divContainer.classList.add("smallHighlight", highlightColor);
 }
 
+/* Gets the sender / receiver feedback HTML element */
+function getFeedback(receiver) {
+    return receiver? $('receiverFeedback') : $('senderFeedback');
+}
+
 /**
  * Creates a download link for a list item and displays it in blue.
  * @param {File} file - The target file to download
