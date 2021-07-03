@@ -2,7 +2,6 @@ console.log("Sender script loaded");
 
 var senderConnection;	/* Sender RTCPeerConnection 			*/
 var senderCertificate;	/* Sender authentication certificate	*/
-var receiverCode;		/* The code derived from the certificate*/
 var currentReceiverID;	/* Receiver Socket ID  					*/
 var inputedSenderCode;	/* Sender Code, stored from the page	*/
 var senderDataChannel;	/* Sender P2P DataChannel 				*/
@@ -25,7 +24,7 @@ function launchClientSender() {
     }
 	RTCPeerConnection.generateCertificate(encryptionAlgorithm).then(function(certificates) {
 		senderCertificate = certificates;
-		receiverCode = hashToPassphrase(certificates.getFingerprints()[0].value);
+		var receiverCode = hashToPassphrase(certificates.getFingerprints()[0].value);
 		setCodeLabel(receiverCode, "receiverCodeContainer");
 		socket.emit('requestNewRoom', filesMsg, receiverCode);
 	});
@@ -63,7 +62,7 @@ socket.on("initDownload", function() {
 		certificates: [senderCertificate]
 	});
 	senderConnection.onicecandidate = onIceCandidateRTC_A;
-	senderConnection.oniceconnectionstatechange = iceConnectionStateChange_A;
+	senderConnection.oniceconnectionstatechange = (event) => console.log("RTC : ICE state : ",event.target.connectionState);
 	var senderDataChannelOptions = {
 		ordered:true,
 		binaryType:"arraybuffer",
@@ -74,26 +73,22 @@ socket.on("initDownload", function() {
 	senderDataChannel.onclose = closeSendingDC;
 	senderDataChannel.onmessage = (message) => {console.log("DataChannel : message : ", message.data)};
 	senderDataChannel.onerror = (error) => {console.log("DataChannel : ERROR : ", error); };
-	startSignaling(false);
+	startSignaling();
 });
 
-/**
- * Starts the signaling process, sends an SDP offer. Called on receiver request.
- * @param {boolean} iceRestart - reconnection restart flag after connection loss or failure.
- */
-function startSignaling(iceRestart) {
+/* Starts the signaling process, sends an SDP offer. Called on receiver request. */
+function startSignaling() {
 	senderConnection.createOffer(
 		function (offerSDP) {
-			console.log(offerSDP);
 			console.log(senderConnection.getConfiguration().certificates[0]);
 			senderConnection.setLocalDescription(offerSDP);
-			socket.emit("offerSDP", offerSDP, currentReceiverID, iceRestart);
+			socket.emit("offerSDP", offerSDP, currentReceiverID);
 		},
 		function (error) {
 			console.log(error);
 		},
 		options = {
-			"iceRestart" : iceRestart,
+			"iceRestart" : false,
 		}
 	)
 }
@@ -123,12 +118,11 @@ socket.on("answerSDP", function (answerSDP) {
  * @param {RTCPeerConnectionIceEvent} event - Networking ICE event, contains an RTCIceCandidate
  */
 async function onIceCandidateRTC_A(event) {
+	if (senderConnection == null) return;
 	while (senderConnection.remoteDescription==undefined)
 		await asyncSleep(50);
 	console.log("RTC : IceCandidateA created, it will be sent");
 	if (event.candidate) {
-		
-        console.log("candidate : ",event.candidate);
 		socket.emit("IceCandidateA", event.candidate, currentReceiverID);
 	} else {
 		console.log ("RTC : End-of-candidates");
@@ -138,6 +132,7 @@ async function onIceCandidateRTC_A(event) {
 /** Delivers an ICE candidate from the receiver to the local connection. */
 socket.on("IceCandidateB", function (IceCandidateB) {
 	console.log("Socket : Received ICE Candidate B");
+	if (senderConnection == null) return;
 	senderConnection.addIceCandidate(IceCandidateB)
 	.then(
 		function() {
@@ -178,28 +173,3 @@ function closeSendingDC() {
 	currentReceiverID = null;
 	senderDataChannel = null;
 }
-
-/**
- * TODO
- * @param {Event} event - state change event, with connectivity informations.
- */
-function iceConnectionStateChange_A(event) {
-	console.log(event);
-	console.log("RTC : ICE state : ",senderConnection.iceConnectionState);
-	if (senderConnection.iceConnectionState == "failed" ||  senderConnection.iceConnectionState == "disconnected") {
-		asyncSleep(5000).then(() => {
-			if (senderConnection.iceConnectionState == "failed" ||  senderConnection.iceConnectionState == "disconnected") {
-				console.log("RTC+Socket : Restoring connection");
-				socket = io.connect(url);
-				socket.emit("restoreConnection", receiverCode, true);
-			}
-		})
-	}
-}
-
-socket.on("restartSignaling", function (receiverID) {
-	console.log("Socket : restarting signaling");
-	currentReceiverID = receiverID;
-	senderConnection.restartIce();
-	startSignaling(true);
-});

@@ -78,7 +78,7 @@ socket.on('abortDownload', function() {
  * Creates immediately a peer connection and pass it the SDP offer with the certificate.
  * Sends an SDP answer back.
  */
-socket.on("offerSDP", function (offerSDP, senderID, iceRestart) {
+socket.on("offerSDP", function (offerSDP, senderID) {
 	console.log("Socket : Received SDP offer");
 	// inputedReceiverCode = "fakeWrongCodeForCerticateTesting";
 	if (hashToPassphrase(getSDPFingerprint(offerSDP)) != inputedReceiverCode) {
@@ -88,15 +88,13 @@ socket.on("offerSDP", function (offerSDP, senderID, iceRestart) {
 	console.log("SDP : ", offerSDP);
 	console.log("fingerprint : ",getSDPFingerprint(offerSDP));
 	currentSenderID = senderID;
-	if ( ! iceRestart) {
-		receiverConnection = new RTCPeerConnection({
-			iceServers: iceServers,
-			certificates: [receiverCertificate]
-			});
-		receiverConnection.onicecandidate = onIceCandidateRTC_B;
-		receiverConnection.oniceconnectionstatechange = iceConnectionStateChange_B;
-		receiverConnection.ondatachannel = receiveDataChannelRTC;
-	}
+	receiverConnection = new RTCPeerConnection({
+		iceServers: iceServers,
+		certificates: [receiverCertificate]
+		});
+	receiverConnection.onicecandidate = onIceCandidateRTC_B;
+	receiverConnection.oniceconnectionstatechange = (event) => console.log("RTC : ICE state : ",event.target.connectionState);
+	receiverConnection.ondatachannel = receiveDataChannelRTC;
 	receiverConnection.setRemoteDescription(offerSDP);
 	receiverConnection.createAnswer(
 		function (answerSDP) {
@@ -125,6 +123,7 @@ socket.on("receiverAuthenticationFailed", function() {
 /** Delivers an ICE candidate from the receiver to the local connection. */
 socket.on("IceCandidateA", function (IceCandidateA) {
 	console.log("Socket : Received ICE Candidate A");
+	if (receiverConnection == null) return;
 	receiverConnection.addIceCandidate(IceCandidateA)
 	.then(
 		function() {
@@ -143,6 +142,7 @@ socket.on("IceCandidateA", function (IceCandidateA) {
  */
 function onIceCandidateRTC_B(event) {
 	console.log("RTC : IceCandidateB created, it will be sent");
+	if (receiverConnection == null) return;
 	if (event.candidate) {
 		socket.emit("IceCandidateB", event.candidate, currentSenderID);
 	}
@@ -182,27 +182,3 @@ function closeReceivingDC() {
 	currentSenderID = null;
 	receiverDataChannel = null;
 }
-
-/**
- * TODO
- * @param {Event} event 
- */
- function iceConnectionStateChange_B(event) {
-	console.log(event)
-	console.log("RTC : ICE state : ",event.target.connectionState);
-	if (receiverConnection.iceConnectionState == "failed" ||  receiverConnection.iceConnectionState == "disconnected") {
-		asyncSleep(5000).then(() => {
-			if (receiverConnection.iceConnectionState == "failed" ||  receiverConnection.iceConnectionState == "disconnected") {
-				asyncSleep(1000).then(() => {
-					console.log("RTC+Socket : Restoring connection");
-					socket = io.connect(url);
-					socket.emit("restoreConnection",inputedReceiverCode,false);
-				});
-			}
-		})
-	}
-}
-
-socket.on("updateSocket", function(senderID) {
-	currentSenderID = senderID;
-});

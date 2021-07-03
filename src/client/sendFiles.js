@@ -34,6 +34,7 @@ function sendFilesAsyncCallback(file) {
  * @param {File} file - The file to send
  */
 function sendFileAsync(file) {
+    if (senderDataChannel == null || file == undefined) return;
     console.log("Sending of file "+file.name+" begins");
     var offset = 0;
     var reader = new FileReader();
@@ -44,6 +45,7 @@ function sendFileAsync(file) {
      */
     reader.onload = async function(event) {
         var result = event.target.result;
+        if (senderDataChannel == null) return;
         while (senderDataChannel.bufferedAmount + result.byteLength > maxBufferedAmount)
             await asyncSleep(50);
         senderDataChannel.send(result);
