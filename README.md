@@ -1,1 +1,0 @@
-# davidbaschung.github.io
