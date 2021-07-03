@@ -35,7 +35,7 @@ function setRole(role) {
             $("mainView").innerHTML = this.responseText;
         }
     };
-    request.open("GET", fileName, false);
+    request.open("GET", "view/"+fileName, false);
     request.send();
 }
 

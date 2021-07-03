@@ -48,7 +48,7 @@ function hashToPassphrase(hash) {
             // console.log("lines extract : ",lines[0]+","+lines[1]+","+lines[2]);
         }
     };
-    request.open("GET", "corncob_lowercase.txt", false);
+    request.open("GET", "utils/corncob_lowercase.txt", false);
     request.send();
     var code = "";
     var numberOfWords = 4;
