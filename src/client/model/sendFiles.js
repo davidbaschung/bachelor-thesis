@@ -58,7 +58,7 @@ function sendFileAsync(file) {
     };
     reader.onerror = (error) => {
         console.log("File Reader ERROR : ", error)
-        setFeedback(false, "Reading error : the file doesn't exist on the hard drive", "red");
+        setFeedback(false, "Reading error : the file doesn't exist on the hard drive", colors.RED);
     };
     reader.onabort = () => {console.log("File Reader aborted")};
 
@@ -69,7 +69,7 @@ function sendFileAsync(file) {
     }
 
     readNextSlice(0); /* loading initialization */
-    console.log("exit SendFileAsync. Offset : ", offset);
+    console.log("Sending of file "+file.name+" finished");
 }
 
 /** Called when sending of all files has finished */

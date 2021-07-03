@@ -45,14 +45,14 @@ io.on("connection", function (socket) {
 
     /* Creates a room on sender's request. Receivers can later join the room to obtain files metadata.*/
     socket.on('requestNewRoom', function(files, receiverCode) {
-        console.log("new room created with code ",receiverCode," for socket "+socket.id);
+        console.log("New room created with code ",receiverCode," by socket "+socket.id);
         transferMetaDataMap.set(receiverCode, new TransferMetaData(socket, files));
         socket.emit('newRoomCreated');
     });
 
     /* Deletes the sender's room. A cancelling message is sent to the receiver.*/
     socket.on("abortUpload", function(receiverCode, receiverID) {
-        console.log("Aborting upload");
+        console.log("Sender aborting upload, socket : ",socket.id);
         var transferMetaData = transferMetaDataMap.get(receiverCode);
         if (transferMetaData == undefined) return;
         socket.emit("uploadAborted");

@@ -3,7 +3,6 @@ console.log("Sender script loaded");
 var senderConnection;	/* Sender RTCPeerConnection 			*/
 var senderCertificate;	/* Sender authentication certificate	*/
 var currentReceiverID;	/* Receiver Socket ID  					*/
-var inputedSenderCode;	/* Sender Code, stored from the page	*/
 var senderDataChannel;	/* Sender P2P DataChannel 				*/
 
 /**
@@ -13,7 +12,6 @@ var senderDataChannel;	/* Sender P2P DataChannel 				*/
  */
 function launchClientSender() {
 	console.log("Client Sender will send "+filesToSend.length+" files.");
-	console.log("socket id : "+socket.id);
     var filesMsg = [filesToSend.length];
     for (var i=0; i<filesToSend.length; i++) {
         var f = filesToSend[i];
@@ -78,9 +76,9 @@ socket.on("initDownload", function() {
 
 /* Starts the signaling process, sends an SDP offer. Called on receiver request. */
 function startSignaling() {
+	console.log("RTC : start signaling process - - - - - - - - - - - - - - - - - -")
 	senderConnection.createOffer(
 		function (offerSDP) {
-			console.log(senderConnection.getConfiguration().certificates[0]);
 			senderConnection.setLocalDescription(offerSDP);
 			socket.emit("offerSDP", offerSDP, currentReceiverID);
 		},
@@ -101,13 +99,14 @@ function startSignaling() {
  */
 socket.on("answerSDP", function (answerSDP) {
 	console.log("Socket : Received SDP answer");
-	inputedSenderCode = getCode(false);
+	var inputedSenderCode = getInput(false);
 	// inputedSenderCode = "fakeWrongCodeForCerticateTesting";
 	if (hashToPassphrase(getSDPFingerprint(answerSDP)) != inputedSenderCode) {
-		setFeedback(false, "The receiver's authentication certificate is not valid or the code is wrong.","red");
+		setFeedback(false, "The receiver's authentication certificate is not valid or the code is wrong.",colors.RED);
 		socket.emit("receiverAuthenticationFailed", currentReceiverID);
 		return;
 	}
+	console.log("The fingerprint authentication succeeded");
 	senderConnection.setRemoteDescription(answerSDP);
 });
 
@@ -164,7 +163,7 @@ function openSendingDC() {
 
 /* Closes files sending. Called by the DataChannel on closing. */
 function closeSendingDC() {
-	console.log("DataChannel : close sending connection");
+	console.log("DataChannel : close sending and reinitialize connection");
 	if (senderConnection != undefined) {
 		senderDataChannel.close();
 		senderConnection.close();

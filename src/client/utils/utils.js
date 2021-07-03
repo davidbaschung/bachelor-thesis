@@ -40,12 +40,11 @@ function copyToClipboard(str) {
  * @returns 
  */
 function hashToPassphrase(hash) {
-    console.log("hash : ", hash);
+    console.log("Hash : source fingerprint : ", hash);
     var lines, request = new XMLHttpRequest();
     request.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             lines = this.responseText.split('\n');
-            // console.log("lines extract : ",lines[0]+","+lines[1]+","+lines[2]);
         }
     };
     request.open("GET", "utils/corncob_lowercase.txt", false);
@@ -62,7 +61,7 @@ function hashToPassphrase(hash) {
         code += word + (i<numberOfWords-1?'-':'') ;
         left = Math.floor(left / base);
     }
-    console.log("code : "+code);
+    console.log("Hash : output code : "+code);
     return code;
 }
 

@@ -3,8 +3,6 @@ console.log("Receiver script loaded");
 var receiverConnection;	/* Receiver RTCPeerConnection 			*/
 var receiverCertificate;/* Receiver Authentication Certificate	*/
 var currentSenderID;	/* Sender Socket ID  					*/
-var senderCode;			/* The code derived from the certificate*/
-var inputedReceiverCode;/* Receiver Code, stored from the input	*/
 var receiverDataChannel;/* Receiver P2P DataChannel 			*/
 
 /**
@@ -13,24 +11,22 @@ var receiverDataChannel;/* Receiver P2P DataChannel 			*/
  */
 function requireFilesMetada(inputedCode) {
 	socket.emit("joinRoom", inputedCode);
-	console.log("inputedCode : ", inputedCode);
-	console.log("Receiver-code inputed was sent");
+	console.log("Receiver code inputed was sent");
 }
 /**
  * Sends a download initialization request to the sender. (through server)
  * Provides the previously inputed receiver-code again.
- * @param {String} inputedCode 
+ * @param {String} inputedCode - receiver code inputed
  */
 function download(inputedCode) {
-	inputedReceiverCode = inputedCode;
-	socket.emit("initDownload", inputedCode);
 	console.log("Request download initialization");
+	socket.emit("initDownload", inputedCode);
 }
 
 /* The server refused the inputed code, a red notice is displayed on the page */
 socket.on("codeRefused", function() {
 	console.log("Socket : Code refused, download rejected");
-	setFeedback(true, "Code refused", "red")
+	setFeedback(true, "Code refused", colors.RED)
 });
 /** 
  * The server accepted the inputed code. The files and their size are listed in green on the page.
@@ -40,8 +36,8 @@ socket.on("codeRefused", function() {
 socket.on("codeAccepted", function(transferMetaData) {
 	RTCPeerConnection.generateCertificate(encryptionAlgorithm).then(function(certificate) {
 		receiverCertificate = certificate;
-		senderCode = hashToPassphrase(certificate.getFingerprints()[0].value);
-		setCodeLabel(senderCode, "senderCodeContainer");
+		var senderCode = hashToPassphrase(certificate.getFingerprints()[0].value);
+		setCodeLabel(senderCode, false);
 	});
 	console.log("Socket : Code accepted, download possible");
 	var sizeMsg, s;
@@ -60,15 +56,15 @@ socket.on("codeAccepted", function(transferMetaData) {
 		filesToReceive.push(f);
 	}
 	message += "</ul></div>";
-	setFeedback(true, message, "green");
-	setReceiverCodeButtonAction('download');
+	setFeedback(true, message, colors.GREEN);
+	setReceiverCodeButtonAction(actions.DOWNLOAD);
 });
 
 /* Called if the sender user intentionally cancelled the download (Reset). A yellow notice is displayed on the page. */
 socket.on('abortDownload', function() {
-	console.log("Socket : Download cancelled");
-	setFeedback(true, "The download was aborted by the sender", "yellow")
-	setCodeLabel("","senderCodeContainer");
+	console.log("Socket : Download cancelled by the sender");
+	setFeedback(true, "The download was aborted by the sender", colors.YELLOW)
+	setCodeLabel("",false);
 });
 
 /** 
@@ -80,13 +76,13 @@ socket.on('abortDownload', function() {
  */
 socket.on("offerSDP", function (offerSDP, senderID) {
 	console.log("Socket : Received SDP offer");
+	var inputedReceiverCode = getInput(true);
 	// inputedReceiverCode = "fakeWrongCodeForCerticateTesting";
 	if (hashToPassphrase(getSDPFingerprint(offerSDP)) != inputedReceiverCode) {
-		setFeedback(true, "The sender's authentication certificate is not valid.","red");
+		setFeedback(true, "The sender's authentication certificate is not valid.",colors.RED);
 		return;
 	}
-	console.log("SDP : ", offerSDP);
-	console.log("fingerprint : ",getSDPFingerprint(offerSDP));
+	console.log("The fingerprint authentication succeeded");
 	currentSenderID = senderID;
 	receiverConnection = new RTCPeerConnection({
 		iceServers: iceServers,
@@ -112,7 +108,7 @@ socket.on("offerSDP", function (offerSDP, senderID) {
  * A red notice is displayed on the page.
  */
 socket.on("receiverAuthenticationFailed", function() {
-	console.log("socket : receiver authentication failed");
+	console.log("Socket : receiver authentication failed");
 	var failed = document.createElement("div");
 	failed.setAttribute("id", "receiverAuthenticationFailed");
 	failed.setAttribute("class", "red smallHighlight");
@@ -122,7 +118,7 @@ socket.on("receiverAuthenticationFailed", function() {
 
 /** Delivers an ICE candidate from the receiver to the local connection. */
 socket.on("IceCandidateA", function (IceCandidateA) {
-	console.log("Socket : Received ICE Candidate A");
+	console.log("Socket : received ICE Candidate A");
 	if (receiverConnection == null) return;
 	receiverConnection.addIceCandidate(IceCandidateA)
 	.then(
@@ -175,7 +171,7 @@ function receiveMessageDC(message) {
 
 /* Closes the DataChannel and the connection. Called by the DataChannel on closing. */
 function closeReceivingDC() {
-	console.log("DataChannel : close receiving connection");
+	console.log("DataChannel : close receiving and reinitialize connection");
 	receiverDataChannel.close();
 	receiverConnection.close();
 	receiverConnection = null;

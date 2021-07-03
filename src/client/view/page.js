@@ -6,6 +6,21 @@ var totalSizeToReceive;     /* Size in bytes for all files to receive           
 var validated = false;      /* Validated files list state, often used too                   */
 var updateStatus = true;    /* Timeout flag for download status refreshment                 */
 
+const roles = {             /* A tag available for each peer can be choosed using roles     */
+    SENDER:1,
+    RECEIVER:2
+}
+const actions = {           /* Actions for the button next to the receiver code input       */
+    RECEIVERCODE:1,
+    DOWNLOAD:2,
+    DOWNLOADING:3
+}
+const colors = {            /* Color tags in CSS stylesheet                                 */
+    YELLOW:"yellow",
+    GREEN:"green",
+    RED:"red"
+}
+
 /**
  * Creates a new HTML element
  * @param {String} nodeString - Type of the element to create
@@ -20,14 +35,13 @@ function create(nodeString, content) {
 
 /**
  * Sets up the page for the sender or the receiver upon role assignment.
- * @param {String} role 
+ * @param {String} role - sender or receiver
  */
 function setRole(role) {
-    console.log("role  : ",role);
     var fileName;
     switch(role) {
-        case 'sender' : fileName = "sender.html"; break;
-        case 'receiver' : fileName = "receiver.html";
+        case roles.SENDER : fileName = "sender.html"; break;
+        case roles.RECEIVER : fileName = "receiver.html";
     }    
     var request = new XMLHttpRequest();
     request.onreadystatechange = function() {
@@ -42,8 +56,8 @@ function setRole(role) {
 /* Resets the receiver environment, when the receiver input is clicked */
 function clickReceiverField() {
     $("receiverCodeInput").value="";
-    setReceiverCodeButtonAction('receiverCode');
-    setCodeLabel("", "senderCodeContainer");
+    setReceiverCodeButtonAction(actions.RECEIVERCODE);
+    setCodeLabel("", false);
     setFeedback(true,"","");
 }
 
@@ -55,36 +69,40 @@ function inputInReceiverField(event) {
     if (event.keyCode == 13) { $('receiverCodeButton').click(); }
 }
 
-/** 
+/**
  * Executes the action of the receiver code button
  * (get files list [OK], init download [download], or disabled [downloading])
+ * @param {Number} action - to execute, constant
  */
-function receiverCodeButton(event, action) {
+function receiverCodeButton(action) {
     switch (action) {
-        case 'receiverCode' :
-            requireFilesMetada( $('receiverCodeInput').value ); break;
-        case 'download' :
-            download( $('receiverCodeInput').value );
+        case actions.RECEIVERCODE :
+            requireFilesMetada( getInput(true) ); break;
+        case actions.DOWNLOAD :
+            download( getInput(true) );
             var failed = $("receiverAuthenticationFailed")
             if (failed != null) failed.remove();
     }
 }
-/* Changes the action and labels of the receiver code button*/
+/**
+ * Changes the action and labels of the receiver code button
+ * @param {Number} action - to set up for ulterior execution
+ */
 function setReceiverCodeButtonAction(action) {
     var button = $('receiverCodeButton');
     button.enable;
     button.classList = "inputButton";
     switch (action) {
-        case 'receiverCode' :
+        case actions.RECEIVERCODE :
             button.innerHTML = "OK",
-            button.setAttribute("onclick","receiverCodeButton(event, 'receiverCode')");
+            button.setAttribute("onclick","receiverCodeButton(actions.RECEIVERCODE)");
             break;
-        case 'download' :
+        case actions.DOWNLOAD :
             button.innerHTML = "Download !",
-            button.classList.add('green'),
-            button.setAttribute("onclick","receiverCodeButton(event, 'download')");
+            button.classList.add(colors.GREEN),
+            button.setAttribute("onclick","receiverCodeButton(actions.DOWNLOAD)");
             break;
-        case 'downloading' :
+        case actions.DOWNLOADING :
             button.innerHTML = "Downloading",
             button.disable;
     }
@@ -92,17 +110,22 @@ function setReceiverCodeButtonAction(action) {
 
 /**
  * Gets the receiver/sender code in the code input field
- * @param {boolean} receiver
+ * @param {Boolean} isReceiver - 'true' targets the receiver
  * @returns the code string
  */
-function getCode(receiver) {
-    label = receiver ? $("receiverCodeInput") : $("senderCodeInput");
+function getInput(isReceiver) {
+    var label = isReceiver ? $("receiverCodeInput") : $("senderCodeInput");
     return label.value;
 }
 
-/* Sets information notices as HTML in the receiver feedback panel */
-function setFeedback(receiver, message, highlightColor) {    
-	var label = receiver? $('receiverFeedback') : $('senderFeedback');
+/**
+ * Sets information notices as HTML in the feedback panel
+ * @param {Boolean} isReceiver - 'true' targets the receiver
+ * @param {HTMLElement} message - HTML content to set
+ * @param {String} highlightColor - panel background color
+ */
+function setFeedback(isReceiver, message, highlightColor) {    
+	var label = isReceiver? $('receiverFeedback') : $('senderFeedback');
 	label.innerHTML = message;
     var divContainer = xpath("./parent::*", label);
     divContainer.classList = "";
@@ -110,15 +133,19 @@ function setFeedback(receiver, message, highlightColor) {
         divContainer.classList.add("smallHighlight", highlightColor);
 }
 
-/* Gets the sender / receiver feedback HTML element */
-function getFeedback(receiver) {
-    return receiver? $('receiverFeedback') : $('senderFeedback');
+/**
+ * Gets the sender / receiver feedback HTML element
+ * @param {Boolean} isReceiver - 'true' targets the receiver
+ * @returns the whole feedback panel
+ */
+function getFeedback(isReceiver) {
+    return isReceiver? $('receiverFeedback') : $('senderFeedback');
 }
 
 /**
  * Creates a download link for a list item and displays it in blue.
  * @param {File} file - The target file to download
- * @param {number} index - The targeted list item index
+ * @param {Number} index - The targeted list item index
  */
 function createLink(file, index) {
     var blob = new Blob(currentReceiveBuffer);
@@ -136,26 +163,27 @@ function createLink(file, index) {
 
 /**
  * Displays a text about the download status, below the receiver feedback.
- * @param {boolean} receiver - True to update receiver's status, false for sender.
+ * The status refreshing is done periodically every 0.5 second.
+ * @param {Boolean} isReceiver - True to update receiver's status, false for sender.
  * @param {String} text - The text to write in the status
- * @param {boolean} instantaneous - Update without waiting next time frame.
+ * @param {Boolean} instantaneous - Update without waiting next time frame.
  * @returns - Wether the displayed status was updated or not
  */
-function updateTransferStatus(receiver, text, instantaneous) {
-    if ( ! updateStatus && ! instantaneous && receiver) return false;
+function updateTransferStatus(isReceiver, text, instantaneous) {
+    if ( ! updateStatus && ! instantaneous && isReceiver) return false;
     updateStatus = false;
     asyncSleep(500).then( function() {
         updateStatus = true;
     });
-    var tag = receiver ? "receiverStatus" : "senderStatus";
+    var tag = isReceiver ? "receiverStatus" : "senderStatus";
     var status = $(tag);
     if (status == null) {
         status = document.createElement("div");
         status.setAttribute("id",tag);
         status.setAttribute("bold","");
-        var containerTag = receiver ? "receiverFeedback" : "senderFeedback";
-        if ( ! receiver)
-            setFeedback(false,"","green");
+        var containerTag = isReceiver ? "receiverFeedback" : "senderFeedback";
+        if ( ! isReceiver)
+            setFeedback(false,"",colors.GREEN);
         var label = $(containerTag);
         label.appendChild(status);
     }
@@ -165,7 +193,7 @@ function updateTransferStatus(receiver, text, instantaneous) {
 
 /**
  * Hovering during a drag-and-drop of the files on the sender box
- * @param {DragEvent} event
+ * @param {DragEvent} event - Mouse Dragging info
  */
 function dragOverAction(event) {
     event.stopPropagation();
@@ -175,7 +203,7 @@ function dragOverAction(event) {
 }
 /**
  * Leaving the box during a drag-and-drop of the files
- * @param {DragEvent} event
+ * @param {DragEvent} event - Mouse Dragging info
  */
 function dragLeaveAction(event)  {
     event.stopPropagation();
@@ -185,7 +213,7 @@ function dragLeaveAction(event)  {
 }
 /**
  * Releasing the mouse button after a drag-and-drop
- * @param {DragEvent} event 
+ * @param {DragEvent} event - Mouse Dragging info
  */
 function dropAction(event) {
     event.stopPropagation();
@@ -226,7 +254,6 @@ function addFiles(files) {
         var filesList = xpath("./ul", $('drop1'));
         var node = create('li', file.name);
         filesList = filesList.appendChild(node);
-        console.log("Page : added file : "+file.name);
     }
     $('validate').removeAttribute("disabled");
 }
@@ -237,7 +264,6 @@ function addFiles(files) {
  * Disables also the validate button and the sender box.
  */
 function validateButton() {
-    console.log("validate");
     validated = true;
     $('drop1').classList.add("disabled");
     $('validate').setAttribute("disabled","true");
@@ -256,9 +282,8 @@ function resetButton() {
     $('drop1').classList.remove("disabled");
 	var label = $('receiverCode');
     abortUpload(label.innerHTML);
-    console.log("Page : removed all files");
 	setResetButtonLabel("reset");
-    setCodeLabel("","receiverCodeContainer");
+    setCodeLabel("",true);
     $('senderCodeInput').value = "" ;
     setFeedback(false, "","");
     closeSendingDC();
@@ -278,19 +303,20 @@ function setResetButtonLabel(label) {
  * Displays the sender or receiver code on the page.
  * This function is used for both the receiver and the sender codes.
  * @param {String} code - Sender / receiver code to display
- * @param {String} containerID - Sender / receiver <div> container identifier
+ * @param {String} isReceiver - Sender / receiver <div> container identifier
  */
-function setCodeLabel(code, containerID) {
+function setCodeLabel(code, isReceiver) {
+    var containerID = isReceiver ? "receiverCodeContainer" : "senderCodeContainer";
 	var container = $(containerID);
 	var codeLabel = xpath(".//*/label",container);
     var infoLabel = xpath("./div",container);
     if (code=="") {
         codeLabel.innerHTML = "[ ]";
-        codeLabel.classList.remove("highlight", "yellow");
+        codeLabel.classList.remove("highlight", colors.YELLOW);
         infoLabel.innerHTML = "";
     } else {
         codeLabel.innerHTML = code;
-        codeLabel.classList.add("highlight", "yellow");
+        codeLabel.classList.add("highlight", colors.YELLOW);
         copyToClipboard(code);
         infoLabel.innerHTML = "<b>Code copied to the clipboard.</b>";
     }

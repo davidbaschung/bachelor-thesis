@@ -44,7 +44,6 @@ var iceServers = [
  */
 function getSDPFingerprint(sdpObject) {
 	var sdpProperties = sdpObject.sdp.split("\n");
-	console.log(sdpProperties);
 	var i=0, j=0;
 	var tag = "a=fingerprint";
 	while ( ! (sdpProperties[i].substring(0,tag.length)==tag) )
