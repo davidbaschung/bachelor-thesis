@@ -146,19 +146,25 @@ function getFeedback(isReceiver) {
  * Creates a download link for a list item and displays it in blue.
  * @param {File} file - The target file to download
  * @param {Number} index - The targeted list item index
+ * @param {Boolean} virtual - No link for heavy files. Displays "disabled" style.
  */
-function createLink(file, index) {
-    var blob = new Blob(currentReceiveBuffer);
+function createLink(file, index, virtual) {    
     var expression = ".//li["+(index+1)+"]";
     var li = xpath(expression,$("receiverFeedback"));
-    var downloadLink = document.createElement("a");
-    downloadLink.href = URL.createObjectURL(blob);
-    downloadLink.textContent = file.name;
-    downloadLink.download = file.name;
-    downloadLink.classList="highlightedLink";
-    downloadLink.click();
     li.innerHTML = "";
-    li.append(downloadLink);
+    if ( ! virtual ) {
+        var blob = new Blob(currentReceiveBuffer);
+        var previewLink = document.createElement("a");
+        previewLink.href = URL.createObjectURL(blob);
+        previewLink.textContent = file.name;
+        previewLink.download = file.name;
+        previewLink.classList="highlightedLink";
+        li.append(previewLink);
+    } else {
+        label = create("label", file.name);
+        label.classList="lowLighted";
+        li.append(label);
+    }
 }
 
 /**

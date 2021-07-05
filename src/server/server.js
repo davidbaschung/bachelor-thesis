@@ -1,14 +1,11 @@
 console.log("server script loaded");
 const expressModule = require("express");
 const socketModule = require("socket.io");
-const utilsModule = require("./utils.js");
 const app = expressModule();
 app.use(expressModule.static("src/client"));
 app.get("/", function (request, response) {
     response.redirect("https://"+url.substring(7,url.length));
 })
-// const httpsModule = require("https");
-// const credentials = utilsModule.getCredentials("."); /* for local https server */
 
 /**
  * Model for each room where the sender and the receiver can meet.

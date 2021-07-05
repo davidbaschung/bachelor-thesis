@@ -47,7 +47,7 @@ function hashToPassphrase(hash) {
             lines = this.responseText.split('\n');
         }
     };
-    request.open("GET", "utils/corncob_lowercase.txt", false);
+    request.open("GET", "utils/dictionary.txt", false);
     request.send();
     var code = "";
     var numberOfWords = 4;

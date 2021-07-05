@@ -1,5 +1,5 @@
 :root {
-  --frontColor:#d8efff;
+  --foregroundColor:#d8efff;
   --backgroundColor:#000340;
   --lightBackgroundColor:#153170;
   --lightBackgroundColorHover:#304985;
@@ -7,9 +7,26 @@
   --linkHighlight:rgb(50, 255, 255);
 }
 
+*[bold] {
+  font-weight: bold;
+}
+
+*[margin] {
+  margin:10px;
+  display:inline-block;
+}
+
+*[large] {
+  width:100%;
+}
+
+*[center] {
+  text-align:center;
+}
+
 body{
   font-family: "Arial";
-  color: var(--frontColor);
+  color: var(--foregroundColor);
   background-color: var(--backgroundColor);
 }
 
@@ -27,19 +44,21 @@ div.outerZone {
   border-radius:10px;
 }
 
-#mainTitle {
+#mainTitleContainer {
   border-radius:20px;
-  padding:20px;
+  padding-top:5px;
+  padding-bottom:20px;
+  margin-bottom:20px;
   text-shadow:0 0 1px white;
   box-shadow:0 0 2px blue, 0 3px 12px black;
   background-color:var(--lightBackgroundColor);
 }
-#mainTitle:hover {
+#mainTitleContainer:hover {
   background-color:var(--lightBackgroundColorHover);
 }
 
 div.titleZone{
-  border: 1px solid var(--frontColor);
+  border: 1px solid var(--foregroundColor);
   border-radius:inherit;
   padding:4px;
   margin:inherit;
@@ -57,6 +76,10 @@ div.innerZone {
   grid-template-columns: auto 100px;
 }
 
+label.gridLabel {
+  width:100%;
+}
+
 input{
   min-width:162px;
 }
@@ -64,19 +87,6 @@ input{
 *.pagewidth{
   margin-left:10%;
   margin-right:10%;
-}
-
-*[bold] {
-  font-weight: bold;
-}
-
-*[margin] {
-  margin:10px;
-  display:inline-block;
-}
-
-*[large] {
-  width:100%;
 }
 
 *.drop{
@@ -123,7 +133,7 @@ button.inputButton {
 label.highlight, div.highlight {
   border-radius:15px;
   padding:20px;
-  color:var(--backgroundColor);
+  color:var(--lightBackgroundColor);
 }
 
 label.smallHighlight, div.smallHighlight, a.smallHighlight {
@@ -144,9 +154,51 @@ label.red, div.red {
   background-color:salmon;
 }
 
-a.highlightedLink {
+a.highlightedLink, label.lowLighted {
   border-radius: 3px;
+  color:var(--backgroundColor);
+}
+a.highlightedLink:link {
   text-shadow: 0 0 5px white;
   box-shadow: 0 0 4px var(--linkHighlight);
   background-color:var(--linkHighlight);
+}
+a.highlightedLink:hover {
+  color:blue;
+}
+a.highlightedLink:active {
+  color:cornflowerblue;
+}
+
+label.lowLighted {
+  background-color:rgb(34, 170, 34);
+}
+label.lowLighted:hover {
+  background-color:darkslategrey;
+}
+
+footer {
+  display:inline;
+  position:relative;
+  bottom:0;
+  height:40px;
+  width:100%;
+  color:var(--foregroundColor);
+}
+
+a.footerElement, a.footerLink {
+  color:var(--foregroundColor);
+  text-align:center;
+}
+
+a.footerLink {
+  color:var(--linkHighlight);
+  margin-left:25px;
+  marin-right:25px;
+}
+a.footerLink:hover {
+  color:aquamarine;
+}
+a.footerLink:active {
+  color:white;
 }

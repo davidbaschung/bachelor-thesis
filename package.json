@@ -60,7 +60,10 @@
     "express": "^4.17.1",
     "jquery": "^3.6.0",
     "node-forge": "^0.10.0",
+    "openssl": "^1.1.0",
+    "ponyfill": "^0.0.1",
     "react": "^17.0.2",
+    "require": "^2.4.20",
     "socket.io": "^4.0.2"
   },
   "devDependencies": {

@@ -65,6 +65,8 @@ socket.on('abortDownload', function() {
 	console.log("Socket : Download cancelled by the sender");
 	setFeedback(true, "The download was aborted by the sender", colors.YELLOW)
 	setCodeLabel("",false);
+	if (window.writer != null)
+		window.writer.close();
 });
 
 /** 
