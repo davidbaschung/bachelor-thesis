@@ -328,7 +328,7 @@ function setCodeLabel(code, isReceiver) {
     }
 }
 
-function getCodeLabel(isReceiver) {
-    var codeLabel = isReceiver ? "receiverCode" : "senderCode";
-    return $(codeLabel).innerHTML;
+function getCodeLabel(isReceiverCode) {
+    var ID = isReceiverCode ? "receiverCode" : "senderCode";
+    return $(ID).innerHTML;
 }
