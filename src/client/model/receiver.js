@@ -195,7 +195,7 @@ function iceConnectionStateChange_B(event) {
 		if ( ! ( state == "connected" ) ) {
 			if (count < MAXCOUNT) {
 				asyncSleep(1000).then(() => {
-					if (count>10 && count%1-0==0) {
+					if (count>=10 && count%5-0==0) {
 						socket = io.connect(url);
 						console.log("Socket : new socket created");
 						socket.emit("restoreConnection", getInput(true), false);
@@ -214,5 +214,6 @@ function iceConnectionStateChange_B(event) {
 /* When the host reconnected, we reset the P2P connection. */
 socket.on("socketsReconnected", function(senderID) {
 	currentSenderID = senderID;
+	console.log("Sockets : updated sender socket : ",senderID,"\n relaunching download");
 	socket.emit("initDownload", inputedCode);
 });

@@ -190,11 +190,11 @@ function iceConnectionStateChange_A(event) {
 		if ( ! ( state == "connected" ) ) {
 			if (count < MAXCOUNT) {
 				asyncSleep(1000).then(() => {
-					if (count==9) {
+					if (count%10==0) {
 						console.log("RTC+Socket : connection lost, reconnecting");
 						readyForSending = false;
 						socket = io.connect(url);
-						console.log("Socket : new socket created");
+						console.log("Socket : new socket created : ",socket.id);
 						socket.emit("restoreConnection", getCodeLabel(false), true);
 						// senderDataChannel.bufferedAmount
 						return;
