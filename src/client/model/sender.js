@@ -195,7 +195,7 @@ function iceConnectionStateChange_A(event) {
 						readyForSending = false;
 						socket = io.connect(url);
 						console.log("Socket : new socket created");
-						socket.emit("restoreConnection", getInput(false), true);
+						socket.emit("restoreConnection", getCodeLabel(false), true);
 						// senderDataChannel.bufferedAmount
 						return;
 					}

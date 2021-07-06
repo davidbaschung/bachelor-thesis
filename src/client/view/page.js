@@ -327,3 +327,8 @@ function setCodeLabel(code, isReceiver) {
         infoLabel.innerHTML = "<b>Code copied to the clipboard.</b>";
     }
 }
+
+function getCodeLabel(isReceiver) {
+    var codeLabel = isReceiver ? "receiverCode" : "senderCode";
+    return codeLabel.innerHTML;
+}
