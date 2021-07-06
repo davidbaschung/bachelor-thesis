@@ -57,6 +57,7 @@ io.on("connection", function (socket) {
         if (receiverID != undefined)
             socket.to(receiverID).emit("abortDownload");
         transferMetaDataMap.delete(receiverCode);
+        console.log("Room deleted");
     });
 
     /**
@@ -139,6 +140,7 @@ io.on("connection", function (socket) {
         console.log("Restoring connection. Code : ",receiverCode," , isHost : ",isHost);
         var transferMetaData = transferMetaDataMap.get(receiverCode);
         if (transferMetaData == undefined) return;
+        console.log("Metadata host : ",transferMetaData.roomHostSocket);
         if (isHost) {
             transferMetaData.roomHostSocket = socket;
             transferMetaData.hostReconnected = true;
