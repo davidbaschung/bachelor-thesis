@@ -137,9 +137,9 @@ io.on("connection", function (socket) {
      * To restore it, the room is re-accessed with new sockets and the receiver code.
      */
     socket.on("restoreConnection", function (receiverCode, isHost) {
-        console.log("Restoring connection. Code : ",receiverCode," , isHost : ",isHost);
+        console.log("Restoring connection with code : ",receiverCode," , isHost : ",isHost);
         var transferMetaData = transferMetaDataMap.get(receiverCode);
-        console.log("Metadata host : ",transferMetaData.roomHostSocket.id);
+        console.log("-> Some metadata :  host : ",transferMetaData.roomHostSocket.id,", hostReconnected : ", transferMetaDataMap.hostReconnected);
         // if (transferMetaData == undefined) return;
         // try {
         // } catch (error) {console.log(error)};
@@ -148,10 +148,10 @@ io.on("connection", function (socket) {
             transferMetaData.hostReconnected = true;
             console.log("Connection restored, new host : ", socket.id);
         } else {
-            if (transferMetaData.hostReconnected == true) {
+            // if (transferMetaData.hostReconnected) {
                 transferMetaData.hostReconnected = false;
                 socket.emit("socketsReconnected", transferMetaData.roomHostSocket.id);
-            }
+            // }
         }
     });
 

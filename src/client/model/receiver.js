@@ -173,10 +173,12 @@ function receiveMessageDC(message) {
 /* Closes the DataChannel and the connection. Called by the DataChannel on closing. */
 function closeReceivingDC() {
 	console.log("DataChannel : close receiving and reinitialize connection");
-	receiverDataChannel.close();
-	receiverConnection.close();
-	receiverConnection = null;
+	if (receiverDataChannel != null)
+		receiverDataChannel.close();
+	if (receiverConnection != null)
+		receiverConnection.close();
 	currentSenderID = null;
+	receiverConnection = null;
 	receiverDataChannel = null;
 }
 
