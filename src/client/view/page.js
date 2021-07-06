@@ -309,10 +309,10 @@ function setResetButtonLabel(label) {
  * Displays the sender or receiver code on the page.
  * This function is used for both the receiver and the sender codes.
  * @param {String} code - Sender / receiver code to display
- * @param {String} isReceiver - Sender / receiver <div> container identifier
+ * @param {String} isReceiverCode - Sender / receiver <div> container identifier
  */
-function setCodeLabel(code, isReceiver) {
-    var containerID = isReceiver ? "receiverCodeContainer" : "senderCodeContainer";
+function setCodeLabel(code, isReceiverCode) {
+    var containerID = isReceiverCode ? "receiverCodeContainer" : "senderCodeContainer";
 	var container = $(containerID);
 	var codeLabel = xpath(".//*/label",container);
     var infoLabel = xpath("./div",container);

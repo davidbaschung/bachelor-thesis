@@ -194,6 +194,8 @@ function iceConnectionStateChange_A(event) {
 						console.log("RTC+Socket : connection lost, reconnecting");
 						readyForSending = false;
 						socket = io.connect(url);
+						while (socket==undefined)
+							await asyncSleep(1000);
 						console.log("Socket : new socket created : ",socket.id);
 						socket.emit("restoreConnection", getCodeLabel(true), true);
 						// senderDataChannel.bufferedAmount
