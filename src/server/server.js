@@ -175,9 +175,27 @@ io.on("connection", function (socket) {
     // }
 
     socket.on("hey", function() {
+        console.log("hey");
+    })
+
+    socket.on("ping", function() {
         console.log("GOT PINGED");
-        socket.emit("ho", "PING BACK");
+        socket.emit("pong", "PING BACK");
     });
+
+    socket.on("close", function() {
+        console.log("Received close message");
+        socket.close();
+        socket = io.connect(url);
+        socket.emit("close");
+    })
+
+    socket.on("closeSoft", function() {
+        console.log("Received closeSoft message");
+        socket.close();
+        socket2 = io.connect(url);
+        socket2.emit("close");
+    })
 
     // var mySocket;
 

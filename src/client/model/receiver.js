@@ -198,9 +198,10 @@ function iceConnectionStateChange_B(event) {
 			if (count < MAXCOUNT) {
 				asyncSleep(1000).then(() => {
 					if (count>=10 && count%5==0) {
+						socket.close();
 						socket = io.connect(url);
 						socket.emit("restoreConnection", getInput(true), false);
-						console.log("Socket : new socket created");
+						console.log("New socket created");
 					}
 					checkConnectivity(++count);
 				});
@@ -228,3 +229,7 @@ function ping() {
 socket.on("ho", function(message) {
 	console.log(message);
 });
+
+socket.on("close", function() {
+	console.log("Received close message from server");
+})

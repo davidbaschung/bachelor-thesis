@@ -193,6 +193,7 @@ function iceConnectionStateChange_A(event) {
 					if (count>0 && count%10==0) {
 						console.log("RTC+Socket : connection lost, reconnecting");
 						readyForSending = false;
+						socket.close();
 						socket = io.connect(url);
 						console.log("Socket : new socket created : ",socket.id);
 						socket.emit("restoreConnection", getCodeLabel(true), true);
