@@ -140,7 +140,9 @@ io.on("connection", function (socket) {
         console.log("Restoring connection. Code : ",receiverCode," , isHost : ",isHost);
         var transferMetaData = transferMetaDataMap.get(receiverCode);
         if (transferMetaData == undefined) return;
-        console.log("Metadata host : ",transferMetaData.roomHostSocket);
+        try {
+            console.log("Metadata host : ",transferMetaData.roomHostSocket);
+        } catch (error) {console.log(error)};
         if (isHost) {
             transferMetaData.roomHostSocket = socket;
             transferMetaData.hostReconnected = true;
