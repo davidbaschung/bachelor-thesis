@@ -195,7 +195,7 @@ function iceConnectionStateChange_B(event) {
 		if ( ! ( state == "connected" ) ) {
 			if (count < MAXCOUNT) {
 				asyncSleep(1000).then(() => {
-					if (count>=10 && count%5-0==0) {
+					if (count>=10 && count%5==0) {
 						socket = io.connect(url);
 						console.log("Socket : new socket created");
 						socket.emit("restoreConnection", getInput(true), false);

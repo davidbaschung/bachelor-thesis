@@ -47,21 +47,22 @@ function sendFileAsync(file) {
     reader.onload = async function(event) {
         var result = event.target.result;
         if ( ! readyForSending) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
-            console.log("Saving DataChannel for recovery");
-            var recoveryReader = new FileReader();
-            recoveryReader.onload = (rec) => recoveredBuffer.push(rec);
+            // console.log("Saving DataChannel for recovery");
             recoveredBuffer = [];
             const OFFSET_T0 = offset - senderDataChannel.bufferedAmount;
             const SLICESCOUNT = senderDataChannel.bufferedAmount/BYTESPERCHUNK;
             for (var i=0; i<SLICESCOUNT; i++) {
                 chunkLocation = OFFSET_T0 + i * BYTESPERCHUNK;
+                var recoveryReader = new FileReader();
+                recoveryReader.onload = (rec) => recoveredBuffer.push(rec);
                 var slice = file.slice(chunkLocation, chunkLocation+BYTESPERCHUNK);
                 recoveryReader.readAsArrayBuffer(slice);
             }
         }
         if (senderDataChannel == null) return;
-        while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT)
-            await asyncSleep(50);
+        while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT
+            || ! readyForSending)
+                await asyncSleep(50);
         senderDataChannel.send(result);
         offset += result.byteLength;
         if (offset < file.size) {
