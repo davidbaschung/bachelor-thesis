@@ -139,10 +139,10 @@ io.on("connection", function (socket) {
     socket.on("restoreConnection", function (receiverCode, isHost) {
         console.log("Restoring connection. Code : ",receiverCode," , isHost : ",isHost);
         var transferMetaData = transferMetaDataMap.get(receiverCode);
-        if (transferMetaData == undefined) return;
-        try {
-            console.log("Metadata host : ",transferMetaData.roomHostSocket);
-        } catch (error) {console.log(error)};
+        console.log("Metadata host : ",transferMetaData.roomHostSocket.id);
+        // if (transferMetaData == undefined) return;
+        // try {
+        // } catch (error) {console.log(error)};
         if (isHost) {
             transferMetaData.roomHostSocket = socket;
             transferMetaData.hostReconnected = true;

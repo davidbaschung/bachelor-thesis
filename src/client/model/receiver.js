@@ -197,7 +197,7 @@ function iceConnectionStateChange_B(event) {
 				asyncSleep(1000).then(() => {
 					if (count>=10 && count%5==0) {
 						socket = io.connect(url);
-						socket.emit("restoreConnection", getInput(false), false);
+						socket.emit("restoreConnection", getInput(true), false);
 						console.log("Socket : new socket created");
 					}
 					checkConnectivity(++count);
@@ -215,5 +215,5 @@ function iceConnectionStateChange_B(event) {
 socket.on("socketsReconnected", function(senderID) {
 	currentSenderID = senderID;
 	console.log("Sockets : updated sender socket : ",senderID,"\n relaunching download");
-	socket.emit("initDownload", inputedCode);
+	socket.emit("initDownload", getInput(true));
 });
