@@ -91,7 +91,7 @@ socket.on("offerSDP", function (offerSDP, senderID) {
 		certificates: [receiverCertificate]
 		});
 	receiverConnection.onicecandidate = onIceCandidateRTC_B;
-	receiverConnection.oniceconnectionstatechange = (event) => console.log("RTC : ICE state : ",event.target.connectionState);
+	receiverConnection.oniceconnectionstatechange = iceConnectionStateChange_B;//= (event) => console.log("RTC : ICE state : ",event.target.connectionState);
 	receiverConnection.ondatachannel = receiveDataChannelRTC;
 	receiverConnection.setRemoteDescription(offerSDP);
 	receiverConnection.createAnswer(
@@ -111,10 +111,9 @@ socket.on("offerSDP", function (offerSDP, senderID) {
  */
 socket.on("receiverAuthenticationFailed", function() {
 	console.log("Socket : receiver authentication failed");
-	var failed = document.createElement("div");
+	var failed = create("div","Your authentication failed. Did you communicate your code to the sender?");
 	failed.setAttribute("id", "receiverAuthenticationFailed");
 	failed.setAttribute("class", "red smallHighlight");
-	failed.innerHTML = "Your authentication failed. Did you communicate your code to the sender?";
 	getFeedback(true).appendChild(failed);
 })
 
@@ -180,3 +179,40 @@ function closeReceivingDC() {
 	currentSenderID = null;
 	receiverDataChannel = null;
 }
+
+/**
+ * Re-establishes the socket connection based on the room existence.
+ * Waits for the sender to reconnect first, and then rejoins and restart the download.
+ * @param {Event} event - peer-to-peer connection state
+ */
+function iceConnectionStateChange_B(event) {
+	const MAXCOUNT = 600;
+	function checkConnectivity(count) {
+		if (receiverConnection==null || receiverConnection==undefined) 
+			return;
+		console.log("RTC : ICE state : ",event.target.connectionState);
+		var state = receiverConnection.iceConnectionState;
+		if ( ! ( state == "connected" ) ) {
+			if (count < MAXCOUNT) {
+				asyncSleep(1000).then(() => {
+					if (count>10 && count%1-0==0) {
+						socket = io.connect(url);
+						console.log("Socket : new socket created");
+						socket.emit("restoreConnection", getInput(true), false);
+					}
+					checkConnectivity(++count);
+				});
+			} else {
+				closeReceivingDC();
+				setFeedback(true,"The connection failed, download cancelled.",colors.RED);
+			}
+		}
+	}
+	checkConnectivity(0);
+}
+
+/* When the host reconnected, we reset the P2P connection. */
+socket.on("socketsReconnected", function(senderID) {
+	currentSenderID = senderID;
+	socket.emit("initDownload", inputedCode);
+});

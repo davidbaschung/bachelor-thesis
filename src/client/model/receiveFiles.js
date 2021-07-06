@@ -33,22 +33,25 @@ function receiveChunks(chunk) {
         fileStream = streamSaver.createWriteStream(file.name);
         window.writer = fileStream.getWriter();
     }
+
     if (receivedSize + length < file.size) {
-        const reader = new Response(chunk).body.getReader();
-        reader.read().then(result => writer.write(result.value) );
-        if ( ! file.size > 100 * Math.pow(10,6))
+        var chunkReader = new Response(chunk).body.getReader();
+        chunkReader.read().then(result => writer.write(result.value))
+            .catch ((error) => {console.log(error); return;});
+        if ( ! ( file.size > 100 * Math.pow(10,6)) )
             currentReceiveBuffer.push(chunk);
         receivedSize += length;
         nextFile = false;
     } else {
+        console.log("file size : ",file.size,", blob size : ",new Blob(currentReceiveBuffer).size);
         var remainingSize = file.size - receivedSize;
         var remainingChunk = chunk.slice(0,remainingSize);
         var nextFileChunk = chunk.slice(remainingSize, chunk.byteLength);
-        const reader = new Response(remainingChunk).body.getReader();
-        reader.read().then(function (result) {
+        var remainingReader = new Response(remainingChunk).body.getReader();
+        remainingReader.read().then(function (result) {
             window.writer.write(result.value)
             window.writer.close();
-         });
+        }).catch ((error) => {console.log(error); return;});
         if ( ! (file.size > 100 * Math.pow(10,6))) {
             currentReceiveBuffer.push(remainingChunk);
             createLink(file, filesToReceiveCount, false);

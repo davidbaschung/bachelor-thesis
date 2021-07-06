@@ -24,8 +24,13 @@
   text-align:center;
 }
 
+@font-face {
+  font-family: "Quantum";
+  src: url("Quantum.otf");
+}
+
 body{
-  font-family: "Arial";
+  font-family:"Arial";
   color: var(--foregroundColor);
   background-color: var(--backgroundColor);
 }
@@ -44,6 +49,10 @@ div.outerZone {
   border-radius:10px;
 }
 
+#mainTitle {
+  font-family: "Quantum";
+}
+
 #mainTitleContainer {
   border-radius:20px;
   padding-top:5px;
@@ -55,6 +64,9 @@ div.outerZone {
 }
 #mainTitleContainer:hover {
   background-color:var(--lightBackgroundColorHover);
+}
+#mainTitleContainer:active {
+  background-color:cadetblue;
 }
 
 div.titleZone{
@@ -123,6 +135,8 @@ li{
 button{
   font-size:18px;
   padding:10px;
+  border-radius:6px;
+  background-color:var(--foregroundColor);
 }
 
 button.inputButton {

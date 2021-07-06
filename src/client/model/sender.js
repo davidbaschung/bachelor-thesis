@@ -1,9 +1,10 @@
 console.log("Sender script loaded");
 
-var senderConnection;	/* Sender RTCPeerConnection 			*/
-var senderCertificate;	/* Sender authentication certificate	*/
-var currentReceiverID;	/* Receiver Socket ID  					*/
-var senderDataChannel;	/* Sender P2P DataChannel 				*/
+var senderConnection;	/* Sender RTCPeerConnection 				*/
+var senderCertificate;	/* Sender authentication certificate		*/
+var currentReceiverID;	/* Receiver Socket ID  						*/
+var senderDataChannel;	/* Sender P2P DataChannel 					*/
+var readyForSending		/* Kill-switch, in case of connection loss	*/
 
 /**
  *	Prepares the sending, called from the page script.
@@ -26,6 +27,7 @@ function launchClientSender() {
 		setCodeLabel(receiverCode, "receiverCodeContainer");
 		socket.emit('requestNewRoom', filesMsg, receiverCode);
 	});
+	readyForSending = true;
 }
 socket.on('newRoomCreated', function() {
 	console.log("Socket : new room created on the server");
@@ -60,7 +62,7 @@ socket.on("initDownload", function() {
 		certificates: [senderCertificate]
 	});
 	senderConnection.onicecandidate = onIceCandidateRTC_A;
-	senderConnection.oniceconnectionstatechange = (event) => console.log("RTC : ICE state : ",event.target.connectionState);
+	senderConnection.oniceconnectionstatechange = iceConnectionStateChange_A;  //= (event) => console.log("RTC : ICE state : ",event.target.connectionState);
 	var senderDataChannelOptions = {
 		ordered:true,
 		binaryType:"arraybuffer",
@@ -76,7 +78,7 @@ socket.on("initDownload", function() {
 
 /* Starts the signaling process, sends an SDP offer. Called on receiver request. */
 function startSignaling() {
-	console.log("RTC : start signaling process - - - - - - - - - - - - - - - - - -")
+	console.log("RTC : start signaling process - - - - - - - - - - - - -")
 	senderConnection.createOffer(
 		function (offerSDP) {
 			senderConnection.setLocalDescription(offerSDP);
@@ -158,12 +160,13 @@ function openSendingDC() {
 	console.log("DataChannel : open Sending");
 	setResetButtonLabel("cancel");
 	setFeedback(false, "","");
-	sendFilesAsync();
+	readyForSending ? sendFilesAsync() : restoreDataChannel();
+	sendFileAsync();
 }
 
 /* Closes files sending. Called by the DataChannel on closing. */
 function closeSendingDC() {
-	console.log("DataChannel : close sending and reinitialize connection");
+	console.log("DataChannel : close sending, dataChannel & connection");
 	if (senderConnection != undefined) {
 		senderDataChannel.close();
 		senderConnection.close();
@@ -172,3 +175,44 @@ function closeSendingDC() {
 	currentReceiverID = null;
 	senderDataChannel = null;
 }
+
+/**
+ * Re-establishes the socket connection, updates the room's host socket on the server.
+ * @param {Event} event - state change event, with connectivity informations.
+ */
+function iceConnectionStateChange_A(event) {
+	const MAXCOUNT = 600;
+	function checkConnectivity(count) {
+		if (senderConnection==null || senderConnection==undefined)
+			return;
+		console.log("RTC : ICE state : ",event.target.connectionState);
+		var state = senderConnection.iceConnectionState;
+		if ( ! ( state == "connected" ) ) {
+			if (count < MAXCOUNT) {
+				asyncSleep(1000).then(() => {
+					if (count==9) {
+						console.log("RTC+Socket : connection lost, reconnecting");
+						readyForSending = false;
+						socket = io.connect(url);
+						console.log("Socket : new socket created");
+						socket.emit("restoreConnection", getInput(false), true);
+						// senderDataChannel.bufferedAmount
+						return;
+					}
+					checkConnectivity(++count);
+				});
+			} else {
+				closeReceivingDC();
+				setFeedback(false,"The connection failed, download cancelled.",colors.RED);
+			}
+		}
+	}
+	checkConnectivity(0);
+}
+
+// socket.on("restartSignaling", function (receiverID) {
+// 	console.log("Socket : restarting signaling");
+// 	currentReceiverID = receiverID;
+// 	senderConnection.restartIce();
+// 	startSignaling(true);
+// });

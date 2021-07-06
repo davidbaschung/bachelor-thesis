@@ -1,9 +1,9 @@
 console.log("server script loaded");
-const expressModule = require("express");
-const socketModule = require("socket.io");
-const app = expressModule();
-app.use(expressModule.static("src/client"));
-app.get("/", function (request, response) {
+const EXPRESS = require("express");
+const SOCKETS = require("socket.io");
+const APP = EXPRESS();
+APP.use(EXPRESS.static("src/client"));
+APP.get("/", function (request, response) {
     response.redirect("https://"+url.substring(7,url.length));
 })
 
@@ -15,6 +15,7 @@ app.get("/", function (request, response) {
 class TransferMetaData {
     constructor(roomHostSocket, files) {
         this.roomHostSocket = roomHostSocket;
+        this.hostReconnected = false;       /* flag activated by host in case of connection failure */
         this.files = files;
         this.size = 0;
         for (var f of files) {
@@ -27,10 +28,10 @@ var port = process.env.PORT;                /* HEROKU.com listening port        
 if (port == null || port == "") {           /* Local port otherwise                                 */
     port = 4001;
 }
-var server = app.listen(port, function () { /* The server listens to the port                       */
+var server = APP.listen(port, function () { /* The server listens to the port                       */
     console.log("Server started");
 });
-var io = socketModule(server);              /* Incoming connections are managed by the socket server*/
+var io = SOCKETS(server);              /* Incoming connections are managed by the socket server*/
 var transferMetaDataMap = new Map();        /* The rooms map each receiver code to files metadata   */
 
 /** 
@@ -128,5 +129,41 @@ io.on("connection", function (socket) {
     /* The receivers download status is relayed to the sender */
     socket.on("transferStatus", function (newStatus, senderID) {
         socket.to(senderID).emit("transferStatus", newStatus);
+    })
+
+    /**
+     * The sender and receiver will both ask for a reconnection
+     * To restore it, the room is re-accessed with new sockets and the receiver code.
+     */
+    socket.on("restoreConnection", function (receiverCode, isHost) {
+        console.log("Restoring connection. Code : ",receiverCode," , isHost : ",isHost);
+        var transferMetaData = transferMetaDataMap.get(receiverCode);
+        if (transferMetaData == undefined) return;
+        if (isHost) {
+            transferMetaData.roomHostSocket = socket;
+            transferMetaData.hostReconnected = true;
+            console.log("Connection restored, new host : ", socket.id);
+        } else {
+            var host = transferMetaData.roomHostSocket
+            if (host == true) {
+                host = false;
+                socket.emit("socketsReconnected", host.id);
+            }
+        }
     });
+
+    // function checkIfHostReconnected(transferMetaData, count) {
+    //     console.log("check socket : ",transferMetaData.roomHostSocket.id);
+    //     if (transferMetaData.hostReconnected == true) {
+    //         transferMetaData.hostReconnected = false;
+    //         console.log("receiver restarts signaling");
+    //         socket.to(transferMetaData.roomHostSocket.id).emit("restartSignaling", socket.id);
+    //         socket.emit("socketsReconnected", transferMetaData.roomHostSocket.id);
+    //     } else {
+    //         if (count<600)
+    //             new Promise((r => setTimeout(r,1000))).then(() => {
+    //                 checkIfHostReconnected(transferMetaData, ++count);
+    //             });
+    //     }
+    // }
 });
