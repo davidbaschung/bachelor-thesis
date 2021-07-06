@@ -148,9 +148,10 @@ io.on("connection", function (socket) {
             transferMetaData.hostReconnected = true;
             console.log("Connection restored, new host : ", socket.id);
         } else {
+            console.log("Is not host. Socket : ", socket.id);
             // if (transferMetaData.hostReconnected) {
-                transferMetaData.hostReconnected = false;
-                socket.emit("socketsReconnected", transferMetaData.roomHostSocket.id);
+            transferMetaData.hostReconnected = false;
+            socket.emit("socketsReconnected", transferMetaData.roomHostSocket.id);
             // }
         }
     });
