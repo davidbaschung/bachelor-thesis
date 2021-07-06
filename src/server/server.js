@@ -146,7 +146,7 @@ io.on("connection", function (socket) {
         } else {
             if (transferMetaData.hostReconnected == true) {
                 transferMetaData.hostReconnected = false;
-                socket.emit("socketsReconnected", transferMetaData.host.id);
+                socket.emit("socketsReconnected", transferMetaData.roomHostSocket.id);
             }
         }
     });
