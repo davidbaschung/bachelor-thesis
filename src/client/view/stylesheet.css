@@ -208,7 +208,7 @@ a.footerElement, a.footerLink {
 a.footerLink {
   color:var(--linkHighlight);
   margin-left:25px;
-  marin-right:25px;
+  margin-right:25px;
 }
 a.footerLink:hover {
   color:aquamarine;

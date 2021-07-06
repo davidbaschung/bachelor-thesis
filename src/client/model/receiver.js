@@ -220,3 +220,11 @@ socket.on("socketsReconnected", function(senderID) {
 	console.log("Sockets : updated sender socket : ",senderID,"\n relaunching download");
 	socket.emit("initDownload", getInput(true));
 });
+
+function ping() {
+	socket.emit("hey");
+}
+
+socket.on("ho", function(message) {
+	console.log(message);
+});

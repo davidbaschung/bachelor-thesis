@@ -210,6 +210,8 @@ function iceConnectionStateChange_A(event) {
 	checkConnectivity(0);
 }
 
+socket.on("hostReconnected", () => console.log("Host Reconnected"));
+
 // socket.on("restartSignaling", function (receiverID) {
 // 	console.log("Socket : restarting signaling");
 // 	currentReceiverID = receiverID;

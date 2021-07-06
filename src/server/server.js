@@ -147,10 +147,13 @@ io.on("connection", function (socket) {
             transferMetaData.roomHostSocket = socket;
             transferMetaData.hostReconnected = true;
             console.log("Connection restored, new host : ", socket.id);
+            console.log("connected socket : ", socket.connected);
+            socket.emit("hostReconnected");
         } else {
             console.log("Is not host. Socket : ", socket.id);
             // if (transferMetaData.hostReconnected) {
             transferMetaData.hostReconnected = false;
+            console.log("connected socket : ", socket.connected);
             socket.emit("socketsReconnected", transferMetaData.roomHostSocket.id);
             // }
         }
@@ -170,4 +173,27 @@ io.on("connection", function (socket) {
     //             });
     //     }
     // }
+
+    socket.on("hey", function() {
+        console.log("GOT PINGED");
+        socket.emit("ho", "PING BACK");
+    });
+
+    // var mySocket;
+
+    // socket.on("test", function() {
+    //     console.log("socket id : ", socket.id);
+    //     x = updateSocket(socket).then( function() {
+    //         socket.emit("tested");
+    //     });
+    // });
+
+    // async function updateSocket(s) {
+    //     await new Promise((resolve => setTimeout(resolve,50)));
+    //     console.log("slept");
+    //     s = 
+    //     console.log("socket id : ", socket.id);
+    // }
+
+
 });
