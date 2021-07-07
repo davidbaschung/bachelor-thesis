@@ -1,11 +1,8 @@
 console.log("server script loaded");
+
 const EXPRESS = require("express");
 const SOCKETS = require("socket.io");
 const APP = EXPRESS();
-APP.use(EXPRESS.static("src/client"));
-APP.get("/", function (request, response) {
-    response.redirect("https://"+url.substring(7,url.length));
-})
 
 /**
  * Model for each room where the sender and the receiver can meet.
@@ -23,6 +20,11 @@ class TransferMetaData {
         }
     }
 }
+
+APP.use(EXPRESS.static("src/client"));
+APP.get("/", function (request, response) {
+    response.redirect("https://"+url.substring(7,url.length));
+})
 
 var port = process.env.PORT;                /* HEROKU.com listening port                            */
 if (port == null || port == "") {           /* Local port otherwise                                 */
@@ -175,12 +177,12 @@ io.on("connection", function (socket) {
     // }
 
     socket.on("hey", function() {
-        console.log("hey");
+        console.log("GOT HEY");
     })
 
     socket.on("ping", function() {
-        console.log("GOT PINGED");
-        socket.emit("pong", "PING BACK");
+        console.log("GOT PING");
+        socket.emit("pong", ("PING BACK"));
     });
 
     socket.on("close", function() {
