@@ -199,7 +199,7 @@ function iceConnectionStateChange_B(event) {
 				asyncSleep(1000).then(() => {
 					if (count>=10 && count%5==0) {
 						socket.close();
-						socket = io.connect(url,{"force new connection":true});
+						socket = io.connect(url);
 						socket.emit("restoreConnection", getInput(true), false);
 						console.log("New socket created");
 					}
@@ -221,27 +221,3 @@ socket.on("socketsReconnected", function(senderID) {
 	console.log("Sockets : updated sender socket : ",senderID,"\n relaunching download");
 	socket.emit("initDownload", getInput(true));
 });
-
-function ping() {
-	socket.emit("ping");
-}
-
-function hey() {
-	socket.emit("hey");
-}
-
-socket.on("pong", function() {
-	console.log("PONG BACK");
-})
-
-socket.on("close", function() {
-	console.log("Received close message from server");
-	socket.close();
-	console.log("closed");
-})
-
-socket.on("destroy", function() {
-	console.log("Received close message from server");
-	socket.destroy();
-	console.log("destroyed");
-})

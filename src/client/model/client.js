@@ -15,7 +15,7 @@ if (/Electron/i.test(navigator.userAgent)) {	/* for the Desktop-app, the URL mus
 		}
 }
 
-var socket = io.connect(url);
+var socket = io.connect(url, {"force new connection":true});
 
 /* encryption algorithm for the certificates */
 var encryptionAlgorithm = {
@@ -54,3 +54,29 @@ function getSDPFingerprint(sdpObject) {
 	var fingerprint = sdpProperties[i].substring(j,sdpProperties[i].length);
 	return fingerprint;
 }
+
+
+
+function ping() {
+	socket.emit("ping");
+}
+
+function hey() {
+	socket.emit("hey");
+}
+
+socket.on("pong", function() {
+	console.log("PONG BACK");
+})
+
+socket.on("close", function() {
+	console.log("Received close message from server");
+	socket.close();
+	console.log("closed");
+})
+
+socket.on("destroy", function() {
+	console.log("Received close message from server");
+	socket.destroy();
+	console.log("destroyed");
+})

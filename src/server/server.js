@@ -161,20 +161,9 @@ io.on("connection", function (socket) {
         }
     });
 
-    // function checkIfHostReconnected(transferMetaData, count) {
-    //     console.log("check socket : ",transferMetaData.roomHostSocket.id);
-    //     if (transferMetaData.hostReconnected == true) {
-    //         transferMetaData.hostReconnected = false;
-    //         console.log("receiver restarts signaling");
-    //         socket.to(transferMetaData.roomHostSocket.id).emit("restartSignaling", socket.id);
-    //         socket.emit("socketsReconnected", transferMetaData.roomHostSocket.id);
-    //     } else {
-    //         if (count<600)
-    //             new Promise((r => setTimeout(r,1000))).then(() => {
-    //                 checkIfHostReconnected(transferMetaData, ++count);
-    //             });
-    //     }
-    // }
+
+
+
 
     socket.on("hey", function() {
         console.log("GOT HEY");
@@ -185,35 +174,10 @@ io.on("connection", function (socket) {
         socket.emit("pong", ("PING BACK"));
     });
 
-    socket.on("close", function() {
+    socket.on("new", function() {
         console.log("Received close message");
-        socket.close();
-        socket = io.connect(url);
+        socket = io.connect(url, {"force new connection":true});
         socket.emit("close");
     })
-
-    socket.on("closeSoft", function() {
-        console.log("Received closeSoft message");
-        socket.close();
-        socket2 = io.connect(url);
-        socket2.emit("close");
-    })
-
-    // var mySocket;
-
-    // socket.on("test", function() {
-    //     console.log("socket id : ", socket.id);
-    //     x = updateSocket(socket).then( function() {
-    //         socket.emit("tested");
-    //     });
-    // });
-
-    // async function updateSocket(s) {
-    //     await new Promise((resolve => setTimeout(resolve,50)));
-    //     console.log("slept");
-    //     s = 
-    //     console.log("socket id : ", socket.id);
-    // }
-
 
 });
