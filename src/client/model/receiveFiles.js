@@ -2,6 +2,7 @@ console.log("ReceiveFiles script loaded");
 
 var filesToReceiveCount = 0;    /* Increment for files counting                                     */
 var currentReceiveBuffer = [];  /* Buffer containing the chunks of the currently downloading file   */
+                                /* Used for download link only, not for streamed file-writing.      */
 var receivedSize = 0;           /* Received bytes size for the currently downloading file           */
 var totalReceivedSize = 0;      /* Received bytes size for all files to download                    */
 var nextFile = true;            /* True if the next file download has begun.                        */
@@ -18,6 +19,7 @@ var fileStream;                 /* Writes the streamed data to the the hard driv
  * @param {ArrayBuffer} chunk - a small chunk of data bytes.
  */
 function receiveChunks(chunk) {
+    /* Streaming setup */
     var file = filesToReceive[filesToReceiveCount];
     var length = chunk.byteLength;
     totalReceivedSize += length;
@@ -34,7 +36,7 @@ function receiveChunks(chunk) {
         window.writer = fileStream.getWriter();
     }
 
-    if (receivedSize + length < file.size) {
+    if (receivedSize + length < file.size) {    /* download of a file still in progress     */
         var chunkReader = new Response(chunk).body.getReader();
         chunkReader.read().then(result => writer.write(result.value))
             .catch ((error) => {console.log(error); return;});
@@ -42,7 +44,7 @@ function receiveChunks(chunk) {
             currentReceiveBuffer.push(chunk);
         receivedSize += length;
         nextFile = false;
-    } else {
+    } else {     /* download of a file (last steps) + download of next file (first steps)   */
         console.log("file size : ",file.size,", blob size : ",new Blob(currentReceiveBuffer).size);
         var remainingSize = file.size - receivedSize;
         var remainingChunk = chunk.slice(0,remainingSize);
@@ -61,7 +63,7 @@ function receiveChunks(chunk) {
         filesToReceiveCount++;
         nextFile = true;      
         currentReceiveBuffer = [];
-        if ( ! file.size > 100 * Math.pow(10,6))
+        if ( file.size < 100 * Math.pow(10,6))
             currentReceiveBuffer.push(nextFileChunk);
         receivedSize = nextFileChunk.byteLength;
         if (filesToReceiveCount == filesToReceive.length) {

@@ -6,7 +6,7 @@ var totalSizeToReceive;     /* Size in bytes for all files to receive           
 var validated = false;      /* Validated files list state, often used too                   */
 var updateStatus = true;    /* Timeout flag for download status refreshment                 */
 
-const roles = {             /* A tag available for each peer can be choosed using roles     */
+const roles = {             /* Fixed identifying tags depending on their roles              */
     SENDER:1,
     RECEIVER:2
 }
@@ -143,7 +143,9 @@ function getFeedback(isReceiver) {
 }
 
 /**
- * Creates a download link for a list item and displays it in blue.
+ * Creates a "downloaded" visual for a list item of the receiver.
+ * Displays it in blue with a downloading link when real data is provided.
+ * Displays it in green only if the link is virtual (streamed for file-writing)
  * @param {File} file - The target file to download
  * @param {Number} index - The targeted list item index
  * @param {Boolean} virtual - No link for heavy files. Displays "disabled" style.
@@ -155,7 +157,7 @@ function createLink(file, index, virtual) {
     if ( ! virtual ) {
         var blob = new Blob(currentReceiveBuffer);
         var previewLink = document.createElement("a");
-        previewLink.href = URL.createObjectURL(blob);
+        previewLink.href = URL.createObjectURL(blob);   /* (opening depends on browser settings) */
         previewLink.textContent = file.name;
         previewLink.download = file.name;
         previewLink.classList="highlightedLink";
@@ -328,6 +330,11 @@ function setCodeLabel(code, isReceiverCode) {
     }
 }
 
+/**
+ * Returns the sender or receiver code from the page label
+ * @param {Boolean} isReceiverCode - true for receiver-code on sender's page label
+ * @returns - The code as a string
+ */
 function getCodeLabel(isReceiverCode) {
     var ID = isReceiverCode ? "receiverCode" : "senderCode";
     return $(ID).innerHTML;

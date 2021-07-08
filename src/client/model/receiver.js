@@ -60,7 +60,10 @@ socket.on("codeAccepted", function(transferMetaData) {
 	setReceiverCodeButtonAction(actions.DOWNLOAD);
 });
 
-/* Called if the sender user intentionally cancelled the download (Reset). A yellow notice is displayed on the page. */
+/**
+ * Called if the sender user intentionally cancelled or aborted the download (Reset), before or during its execution.
+ * A yellow notice is displayed on the page.
+ */
 socket.on('abortDownload', function() {
 	console.log("Socket : Download cancelled by the sender");
 	setFeedback(true, "The download was aborted by the sender", colors.YELLOW)
@@ -91,7 +94,7 @@ socket.on("offerSDP", function (offerSDP, senderID) {
 		certificates: [receiverCertificate]
 		});
 	receiverConnection.onicecandidate = onIceCandidateRTC_B;
-	receiverConnection.oniceconnectionstatechange = iceConnectionStateChange_B;//= (event) => console.log("RTC : ICE state : ",event.target.connectionState);
+	receiverConnection.oniceconnectionstatechange = iceConnectionStateChange_B;
 	receiverConnection.ondatachannel = receiveDataChannelRTC;
 	receiverConnection.setRemoteDescription(offerSDP);
 	receiverConnection.createAnswer(
@@ -105,7 +108,8 @@ socket.on("offerSDP", function (offerSDP, senderID) {
 	);
 });
 
-/** Delivered from the sender if the authentication failed.
+/**
+ * Delivered from the sender if the authentication failed.
  * Might happen if the sender wrongly entered the sender code.
  * A red notice is displayed on the page.
  */
@@ -146,7 +150,7 @@ function onIceCandidateRTC_B(event) {
 }
 
 /**
- * Setups the DataChannel offered by the sender. Exclusive to the receiver.
+ * Sets up the DataChannel offered by the sender. It's Exclusive to the receiver.
  * Attributes appropriate functions to react to DataChannel events.
  * @param {RTCDataChannelEvent} event 
  */
@@ -165,7 +169,7 @@ function openReceivingDC() {
 	console.log("DataChannel : open Receiving");
 }
 
-/* Receive a message containing chunks of files data. Called by a DataChannel event. */
+/* Receives a message containing chunks of files data. Called by a DataChannel event. */
 function receiveMessageDC(message) {
 	receiveChunks(message.data);
 }
@@ -183,8 +187,10 @@ function closeReceivingDC() {
 }
 
 /**
+ * Experimental only with socket.io.
+ * 
  * Re-establishes the socket connection based on the room existence.
- * Waits for the sender to reconnect first, and then rejoins and restart the download.
+ * Waits for the sender to rejoin first, then rejoins and restarts the download.
  * @param {Event} event - peer-to-peer connection state
  */
 function iceConnectionStateChange_B(event) {
@@ -213,7 +219,6 @@ function iceConnectionStateChange_B(event) {
 	}
 	checkConnectivity(0);
 }
-
 /* When the host reconnected, we reset the P2P connection. */
 socket.on("socketsReconnected", function(senderID) {
 	console.log("sockets reconnected");

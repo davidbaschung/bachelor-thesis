@@ -20,7 +20,6 @@ function sendFilesAsync() {
  */
 function sendFilesAsyncCallback(file) {
     console.log("Sending of file "+file.name+" finished");
-
     filesToSendCount++;
     if (filesToSendCount<filesToSend.length)
         sendFilesAsync();
@@ -47,7 +46,6 @@ function sendFileAsync(file) {
     reader.onload = async function(event) {
         var result = event.target.result;
         if ( ! readyForSending) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
-            // console.log("Saving DataChannel for recovery");
             recoveredBuffer = [];
             const OFFSET_T0 = offset - senderDataChannel.bufferedAmount;
             const SLICESCOUNT = senderDataChannel.bufferedAmount/BYTESPERCHUNK;
@@ -87,7 +85,7 @@ function sendFileAsync(file) {
     console.log("Sending of file "+file.name+" finished");
 }
 
-/** Called when sending of all files has finished */
+/* Called when sending of all files has finished */
 function resetFilesSending() {
     console.log("All files have been sent");
     filesToSendCount = 0;

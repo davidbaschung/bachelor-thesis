@@ -2,7 +2,7 @@
  *  /!\ NOTE (David Baschung)
  * 
  * This library is out-of-scope for the project "P2P Secure File Transfer" creation.
- * It is stored locally instead as a module to allow file system access.
+ * It is stored locally instead of as a module to allow file system access.
  * Source : https://github.com/jimmywarting/StreamSaver.js/blob/master/StreamSaver.js
  */
 

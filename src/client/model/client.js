@@ -8,7 +8,7 @@ if (/Electron/i.test(navigator.userAgent)) {	/* for the Desktop-app, the URL mus
 } else {
 	if ( ! url.includes("localhost"))
 		if ( ! url.slice(0,5).includes("https")) {
-			url = "https://" + url.slice(7,url.length);	/* on the navigator, the URL is redirected to https		*/
+			url = "https://" + url.slice(7,url.length);	/* on the navigator, the URL is redirected to https	*/
 			a = create('a',"");
 			a.href = url;
 			a.click();
@@ -39,8 +39,8 @@ var iceServers = [
 
 /**
  * Extracts the fingerprint string from an sdp object
- * @param {sdp} sdpObject - SDP offer or answer
- * @return {string} fingerprint - hexadecimal fingerprint as string
+ * @param {Sdp} sdpObject - SDP offer or answer
+ * @return {String} fingerprint - hexadecimal fingerprint as string
  */
 function getSDPFingerprint(sdpObject) {
 	var sdpProperties = sdpObject.sdp.split("\n");
@@ -54,29 +54,3 @@ function getSDPFingerprint(sdpObject) {
 	var fingerprint = sdpProperties[i].substring(j,sdpProperties[i].length);
 	return fingerprint;
 }
-
-
-
-function ping() {
-	socket.emit("ping");
-}
-
-function hey() {
-	socket.emit("hey");
-}
-
-socket.on("pong", function() {
-	console.log("PONG BACK");
-})
-
-socket.on("close", function() {
-	console.log("Received close message from server");
-	socket.close();
-	console.log("closed");
-})
-
-socket.on("destroy", function() {
-	console.log("Received close message from server");
-	socket.destroy();
-	console.log("destroyed");
-})

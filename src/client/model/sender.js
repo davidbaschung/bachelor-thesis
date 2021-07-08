@@ -4,10 +4,10 @@ var senderConnection;	/* Sender RTCPeerConnection 				*/
 var senderCertificate;	/* Sender authentication certificate		*/
 var currentReceiverID;	/* Receiver Socket ID  						*/
 var senderDataChannel;	/* Sender P2P DataChannel 					*/
-var readyForSending		/* Kill-switch, in case of connection loss	*/
+var readyForSending;	/* Kill-switch, in case of connection loss	*/
 
 /**
- *	Prepares the sending, called from the page script.
+ *	Prepares the sending, called from the (external) "page" script.
  *	Creates a certificate and displays the receiver code.
  *	Send the files list to the server. A confirmation is given back.
  */
@@ -35,7 +35,7 @@ socket.on('newRoomCreated', function() {
 
 /**
  * Orders the server to abort the upload. A confirmation is received.
- * @param {string} receiverCode - Room code for the server
+ * @param {String} receiverCode - Room code for the server
  */
 function abortUpload(receiverCode) {
 	console.log("Upload aborting");
@@ -62,7 +62,7 @@ socket.on("initDownload", function() {
 		certificates: [senderCertificate]
 	});
 	senderConnection.onicecandidate = onIceCandidateRTC_A;
-	senderConnection.oniceconnectionstatechange = iceConnectionStateChange_A;  //= (event) => console.log("RTC : ICE state : ",event.target.connectionState);
+	senderConnection.oniceconnectionstatechange = iceConnectionStateChange_A;
 	var senderDataChannelOptions = {
 		ordered:true,
 		binaryType:"arraybuffer",
@@ -177,12 +177,21 @@ function closeSendingDC() {
 }
 
 /**
- * Re-establishes the socket connection, updates the room's host socket on the server.
+ * Experimental only with socket.io.
+ * 
+ * Manages changing connection states. Re-establishes the socket and P2P connection when lost.
  * @param {Event} event - state change event, with connectivity informations.
  */
 function iceConnectionStateChange_A(event) {
 	const MAXCOUNT = 600;
-	function checkConnectivity(count) {
+	/**
+	 * Checks the P2P connection repetitively.
+	 * Actively tries to reconnect for 10 minutes, if the state isn't "connected".
+	 * Reconnectiong uses a readyForSending flag to authorize/pause sending on dataChannels, then recreates connections.
+	 * @param {Number} count 
+	 * @returns 
+	 */
+	function checkConnectivity(count) {	
 		if (senderConnection==null || senderConnection==undefined)
 			return;
 		console.log("RTC : ICE state : ",event.target.connectionState);
@@ -196,7 +205,6 @@ function iceConnectionStateChange_A(event) {
 						socket = io.connect(url, {"force new connection":true});
 						console.log("Socket : new socket created : ",socket.id);
 						socket.emit("restoreConnection", getCodeLabel(true), true);
-						// senderDataChannel.bufferedAmount
 						return;
 					}
 					checkConnectivity(++count);
@@ -209,12 +217,10 @@ function iceConnectionStateChange_A(event) {
 	}
 	checkConnectivity(0);
 }
-
+/* Host first reconnection after a network failure */
 socket.on("hostReconnected", () => console.log("Host Reconnected"));
-
-// socket.on("restartSignaling", function (receiverID) {
-// 	console.log("Socket : restarting signaling");
-// 	currentReceiverID = receiverID;
-// 	senderConnection.restartIce();
-// 	startSignaling(true);
-// });
+/* Socket aliveness testing */
+socket.on("ping", function (id) {
+	console.log("ping");
+	socket.emit("pong", id);
+});
