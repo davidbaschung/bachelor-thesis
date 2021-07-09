@@ -33,6 +33,15 @@ function copyToClipboard(str) {
 }
 
 /**
+ * Asynchronous way to pause the execution
+ * @param {number} timeMillis - waiting time in milliseconds
+ * @returns A promise that the caller must "await"
+ */
+ async function asyncSleep(timeMillis) {
+    return new Promise((resolve => setTimeout(resolve,timeMillis)));
+}
+
+/**
  * Converts a certificate fingerprint to a code / passphrase of 4 words.
  * This requests the dictionary, then applies modulos to the fingerprint as many times
  * as there should be words to construct the code.
@@ -63,13 +72,4 @@ function hashToPassphrase(hash) {
     }
     console.log("Hash : output code : "+code);
     return code;
-}
-
-/**
- * Asynchronous way to pause the execution
- * @param {number} timeMillis - waiting time in milliseconds
- * @returns A promise that the caller must "await"
- */
- async function asyncSleep(timeMillis) {
-    return new Promise((resolve => setTimeout(resolve,timeMillis)));
 }

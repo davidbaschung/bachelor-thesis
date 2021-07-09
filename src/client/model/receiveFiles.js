@@ -16,12 +16,12 @@ var fileStream;                 /* Writes the streamed data to the the hard driv
  * The remaining data belongs to the next file to download, we set it up.
  * If the files count is complete, we reset the environment.
  * Files > 100MB are streamed, but not kept for preview.
- * @param {ArrayBuffer} chunk - a small chunk of data bytes.
+ * @param {ArrayBuffer} loadOfChunks - a small chunk of data bytes.
  */
-function receiveChunks(chunk) {
+function receiveChunks(loadOfChunks) {
     /* Streaming setup */
     var file = filesToReceive[filesToReceiveCount];
-    var length = chunk.byteLength;
+    var length = loadOfChunks.byteLength;
     totalReceivedSize += length;
     var newStatus = (totalReceivedSize/totalSizeToReceive*100).toFixed(1);
     if (updateTransferStatus(true, newStatus+"% downloaded", false)) {
@@ -37,25 +37,25 @@ function receiveChunks(chunk) {
     }
 
     if (receivedSize + length < file.size) {    /* download of a file still in progress     */
-        var chunkReader = new Response(chunk).body.getReader();
+        var chunkReader = new Response(loadOfChunks).body.getReader();
         chunkReader.read().then(result => writer.write(result.value))
             .catch ((error) => {console.log(error); return;});
         if ( ! ( file.size > 100 * Math.pow(10,6)) )
-            currentReceiveBuffer.push(chunk);
+            currentReceiveBuffer.push(loadOfChunks);
         receivedSize += length;
         nextFile = false;
     } else {     /* download of a file (last steps) + download of next file (first steps)   */
         console.log("file size : ",file.size,", blob size : ",new Blob(currentReceiveBuffer).size);
         var remainingSize = file.size - receivedSize;
-        var remainingChunk = chunk.slice(0,remainingSize);
-        var nextFileChunk = chunk.slice(remainingSize, chunk.byteLength);
-        var remainingReader = new Response(remainingChunk).body.getReader();
+        var remainingChunks = loadOfChunks.slice(0,remainingSize);
+        var nextFileChunks = loadOfChunks.slice(remainingSize, loadOfChunks.byteLength);
+        var remainingReader = new Response(remainingChunks).body.getReader();
         remainingReader.read().then(function (result) {
             window.writer.write(result.value)
             window.writer.close();
         }).catch ((error) => {console.log(error); return;});
         if ( ! (file.size > 100 * Math.pow(10,6))) {
-            currentReceiveBuffer.push(remainingChunk);
+            currentReceiveBuffer.push(remainingChunks);
             createLink(file, filesToReceiveCount, false);
         } else {
             createLink(file, filesToReceiveCount, true);
@@ -64,8 +64,8 @@ function receiveChunks(chunk) {
         nextFile = true;      
         currentReceiveBuffer = [];
         if ( file.size < 100 * Math.pow(10,6))
-            currentReceiveBuffer.push(nextFileChunk);
-        receivedSize = nextFileChunk.byteLength;
+            currentReceiveBuffer.push(nextFileChunks);
+        receivedSize = nextFileChunks.byteLength;
         if (filesToReceiveCount == filesToReceive.length) {
             console.log("All files have been downloaded");
             if (updateTransferStatus(true, newStatus+"% downloaded", true))

@@ -13,20 +13,6 @@ function sendFilesAsync() {
     var file = filesToSend[filesToSendCount];
     sendFileAsync(file);
 }
-/**
- * Callback after one file was sent.
- * Sends the next file or closes sending if all files were sent.
- * @param {File} file - The file whose sending just finished
- */
-function sendFilesAsyncCallback(file) {
-    console.log("Sending of file "+file.name+" finished");
-    filesToSendCount++;
-    if (filesToSendCount<filesToSend.length)
-        sendFilesAsync();
-    else {
-        resetFilesSending();
-    }
-}
 
 /**
  * Sends one file completely.
@@ -85,12 +71,28 @@ function sendFileAsync(file) {
     console.log("Sending of file "+file.name+" finished");
 }
 
+/**
+ * Callback after that one file was sent.
+ * Sends the next file or closes sending if all files were sent.
+ * @param {File} file - The file whose sending just finished
+ */
+function sendFilesAsyncCallback(file) {
+    console.log("Sending of file "+file.name+" finished");
+    filesToSendCount++;
+    if (filesToSendCount<filesToSend.length)
+        sendFilesAsync();
+    else {
+        resetFilesSending();
+    }
+}
+
 /* Called when sending of all files has finished */
 function resetFilesSending() {
     console.log("All files have been sent");
     filesToSendCount = 0;
 }
 
+/* Restores the recovered data from the DataChannel buffer */
 function restoreDataChannel() {
     for (var e in recoveredBuffer)
         senderDataChannel.push(e);

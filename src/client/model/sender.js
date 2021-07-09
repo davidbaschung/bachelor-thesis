@@ -145,16 +145,6 @@ socket.on("IceCandidateB", function (IceCandidateB) {
 	);
 });
 
-/**
- * Delivers the receiver's status.
- * Displays the percentage of transfer accomplishment in the feedback panel.
- */
-socket.on("transferStatus", function (newStatus) {
-	updateTransferStatus(false, newStatus+"% uploaded", true);
-	if (newStatus.includes("100"))
-		setResetButtonLabel("reset");
-});
-
 /* Start files sending. Called by the DataChannel on opening. */
 function openSendingDC() {
 	console.log("DataChannel : open Sending");
@@ -175,6 +165,16 @@ function closeSendingDC() {
 	currentReceiverID = null;
 	senderDataChannel = null;
 }
+
+/**
+ * Delivers the receiver's status.
+ * Displays the percentage of transfer accomplishment in the feedback panel.
+ */
+socket.on("transferStatus", function (newStatus) {
+	updateTransferStatus(false, newStatus+"% uploaded", true);
+	if (newStatus.includes("100"))
+		setResetButtonLabel("reset");
+});
 
 /**
  * Experimental only with socket.io.

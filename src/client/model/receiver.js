@@ -221,7 +221,6 @@ function iceConnectionStateChange_B(event) {
 }
 /* When the host reconnected, we reset the P2P connection. */
 socket.on("socketsReconnected", function(senderID) {
-	console.log("sockets reconnected");
 	currentSenderID = senderID;
 	console.log("Sockets : updated sender socket : ",senderID,"\n relaunching download");
 	socket.emit("initDownload", getInput(true));

@@ -18,7 +18,7 @@ class TransferMetaData {
         for (var f of files) {
             this.size += f.size;
         }
-        this.hostResponded = false      /* flag activated by host to check socket availability      */
+        this.hostResponded = false;      /* flag activated by host to check socket availability      */
         this.noResponseCount = 0;
     }
 }
@@ -149,25 +149,29 @@ io.on("connection", function (socket) {
             transferMetaData.roomHostSocket = socket;
             transferMetaData.hostReconnected = true;
             console.log("Connection restored, new host : ", socket.id);
-            console.log("connected socket : ", socket.connected);
             socket.emit("hostReconnected");
         } else {
             console.log("Is not host. Socket : ", socket.id);
-            // if (transferMetaData.hostReconnected) {
-            transferMetaData.hostReconnected = false;
-            console.log("connected socket : ", socket.connected);
-            socket.emit("socketsReconnected", transferMetaData.roomHostSocket.id);
-            // }
+            if (transferMetaData.hostReconnected) {
+                transferMetaData.hostReconnected = false;
+                console.log("connected socket : ", socket.connected);
+                socket.emit("socketsReconnected", transferMetaData.roomHostSocket.id);
+            }
         }
     });
 
+    /* Used for socket aliveness verification to remove dead connections */
     socket.on("pong", function (receiverCode) {
         console.log("pong from ",socket.id);
         transferMetaDataMap.get(receiverCode).hostResponded = true;
     });
 });
 
-/* Cleans the phantom rooms that haven't been used 10 minutes after the last connection. */
+/**
+ * Experimental only with socket.io
+ * 
+ * Cleans the phantom rooms that haven't been used 10 minutes after the last connection.
+ */
 async function cleanUnusedRooms() {
     size_t0 = transferMetaDataMap.size;
     for (var [key,value] of transferMetaDataMap.entries()) {
