@@ -138,6 +138,9 @@ button{
   border-radius:6px;
   background-color:var(--foregroundColor);
 }
+button:hover{
+  background-color:#FFFFFF;
+}
 
 button.inputButton {
   font-size:14px;
