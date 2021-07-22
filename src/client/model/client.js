@@ -6,16 +6,13 @@ if (/Electron/i.test(navigator.userAgent)) {	/* for the Desktop-app, the URL mus
 } else if ( ! /Chrome|CriOS|Edge|Edg|EdgiOS/.test(navigator.userAgent)) {
 	alert("You need to use Google Chrome or Microsoft Edge to use this application");
 } else {
-	// HTTPS PROVISIONALLY NOT FORCED (FOR SSL VALIDATION)
-	// 
-	// if ( ! url.includes("localhost"))
-		// if ( ! url.slice(0,5).includes("https")) {
-		// 	url = "https://" + url.slice(7,url.length);	/* on the navigator, the URL is redirected to https	*/
-		// 	a = create('a',"");
-		// 	a.href = url;
-		// 	a.click();
-		// }
-
+	if ( ! url.includes("localhost"))
+		if ( ! url.slice(0,5).includes("https")) {
+			url = "https://" + url.slice(7,url.length);	/* on the navigator, the URL is redirected to https	*/
+			a = create('a',"");
+			a.href = url;
+			a.click();
+		}
 }
 
 var socket = io.connect(url, {"force new connection":true});
