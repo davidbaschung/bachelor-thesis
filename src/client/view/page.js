@@ -99,6 +99,7 @@ function setReceiverCodeButtonAction(action) {
             break;
         case actions.DOWNLOAD :
             button.innerHTML = "Download !",
+            button.classList.add("downloadButton"),
             button.classList.add(colors.GREEN),
             button.setAttribute("onclick","receiverCodeButton(actions.DOWNLOAD)");
             break;
