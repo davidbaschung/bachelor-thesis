@@ -16,6 +16,7 @@ if (/Electron/i.test(navigator.userAgent)) {	/* for the Desktop-app, the URL mus
 }
 
 var socket = io.connect(url, {"force new connection":true});
+console.log("Socket created. ID : ", socket.id);
 
 /* encryption algorithm for the certificates */
 var encryptionAlgorithm = {

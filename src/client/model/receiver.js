@@ -202,7 +202,7 @@ function iceConnectionStateChange_B(event) {
 		var state = receiverConnection.iceConnectionState;
 		if ( ! ( state == "connected" ) ) {
 			if (count < MAXCOUNT) {
-				asyncSleep(1000).then(() => {
+				asyncSleep(3000).then(() => {
 					if (count>=10 && count%5==0) {
 						// socket.close();
 						// socket = io.connect(url);

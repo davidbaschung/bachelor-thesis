@@ -91,7 +91,7 @@ io.on("connection", function (socket) {
 
     /* A download initialization request is relayed from the receiver to the sender. The code is controlled again. */
     socket.on("initDownload", function(inputedCode) {
-        console.log("download initialization request from socket "+socket.id);
+        console.log("download initialization request from socket "+socket.id+" to socket ",transferMetaData.roomHostSocket.id);
         var transferMetaData = transferMetaDataMap.get(inputedCode)
         if (transferMetaData == undefined) return;
         var receiverID = socket.id;
