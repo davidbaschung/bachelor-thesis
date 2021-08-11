@@ -1,7 +1,7 @@
 console.log("SendFiles script loaded");
-
-const BYTESPERCHUNK = 16000;        /* Bytes size for loading and queuing in buffer */
-const MAXBUFFEREDAMOUNT = 16000000; /* Buffer max size, for Chrome                  */
+//TODO
+const BYTESPERCHUNK = 10000;        /* Bytes size for loading and queuing in buffer */
+const MAXBUFFEREDAMOUNT = 14000000; /* Buffer max size, for Chrome                  */
 var filesToSendCount = 0;           /* Increment for files counting                 */
 var recoveredBuffer;                /* Recovery list for data in datachannel buffer */
 
@@ -95,7 +95,8 @@ function resetFilesSending() {
 
 /* Restores the recovered data from the DataChannel buffer */
 function restoreDataChannel() {
+    console.log("Restoring Data Channel. Recovered Buffer : ", recoveredBuffer);
     for (var e in recoveredBuffer)
-        senderDataChannel.push(e);
+        senderDataChannel.send(e);
     readyForSending = true;
 }
