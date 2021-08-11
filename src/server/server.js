@@ -146,7 +146,7 @@ io.on("connection", function (socket) {
         var transferMetaData = transferMetaDataMap.get(receiverCode);
         console.log("-> Some metadata :  host : ",transferMetaData.roomHostSocket.id,", hostReconnected : ", transferMetaData.hostReconnected);
         if (isHost) {
-            // transferMetaData.roomHostSocket = socket;
+            transferMetaData.roomHostSocket = socket;
             // console.log("host socket before : ",transferMetaData.roomHostSocket.id," ,   host socket after : ",socket.id);
             transferMetaData.hostReconnected = true;
             // console.log("var-transferMetadata connected : ", transferMetaData.hostReconnected," ,    Map connected : ", transferMetaDataMap.get(receiverCode).hostReconnected);
