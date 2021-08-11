@@ -1,7 +1,7 @@
 console.log("SendFiles script loaded");
 //TODO
-const BYTESPERCHUNK = 10000;        /* Bytes size for loading and queuing in buffer */
-const MAXBUFFEREDAMOUNT = 14000000; /* Buffer max size, for Chrome                  */
+const BYTESPERCHUNK = 16000;        /* Bytes size for loading and queuing in buffer */
+const MAXBUFFEREDAMOUNT = 16000000; /* Buffer max size, for Chrome                  */
 var filesToSendCount = 0;           /* Increment for files counting                 */
 var recoveredBuffer;                /* Recovery list for data in datachannel buffer */
 
@@ -43,10 +43,11 @@ function sendFileAsync(file) {
                 var slice = file.slice(chunkLocation, chunkLocation+BYTESPERCHUNK);
                 recoveryReader.readAsArrayBuffer(slice);
             }
+            while ( ! readyForSending )
+                await asyncSleep(50);
         }
         if (senderDataChannel == null) return;
-        while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT
-            || ! readyForSending)
+        while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT)
                 await asyncSleep(50);
         senderDataChannel.send(result);
         offset += result.byteLength;
