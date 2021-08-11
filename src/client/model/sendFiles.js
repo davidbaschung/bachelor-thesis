@@ -3,7 +3,7 @@ console.log("SendFiles script loaded");
 const BYTESPERCHUNK = 16000;        /* Bytes size for loading and queuing in buffer */
 const MAXBUFFEREDAMOUNT = 16000000; /* Buffer max size, for Chrome                  */
 var filesToSendCount = 0;           /* Increment for files counting                 */
-var recoveredBuffer;                /* Recovery list for data in datachannel buffer */
+var recoveredBuffer = [];                /* Recovery list for data in datachannel buffer */
 
 /**
  * Begins sending of all files.
