@@ -144,11 +144,12 @@ io.on("connection", function (socket) {
     socket.on("restoreConnection", function (receiverCode, isHost) {
         console.log("Restoring connection with code : ",receiverCode," , isHost : ",isHost);
         var transferMetaData = transferMetaDataMap.get(receiverCode);
-        console.log("-> Some metadata :  host : ",transferMetaData.roomHostSocket.id,", hostReconnected : ", transferMetaDataMap.hostReconnected);
+        console.log("-> Some metadata :  host : ",transferMetaData.roomHostSocket.id,", hostReconnected : ", transferMetaData.hostReconnected);
         if (isHost) {
-            transferMetaData.roomHostSocket = socket;
+            // transferMetaData.roomHostSocket = socket;
+            // console.log("host socket before : ",transferMetaData.roomHostSocket.id," ,   host socket after : ",socket.id);
             transferMetaData.hostReconnected = true;
-            console.log("Connection restored, new host : ", socket.id);
+            // console.log("var-transferMetadata connected : ", transferMetaData.hostReconnected," ,    Map connected : ", transferMetaDataMap.get(receiverCode).hostReconnected);
             socket.emit("hostReconnected");
         } else {
             console.log("Is not host. Socket : ", socket.id);
