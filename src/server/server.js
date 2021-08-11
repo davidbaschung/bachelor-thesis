@@ -90,12 +90,12 @@ io.on("connection", function (socket) {
     })
 
     /* A download initialization request is relayed from the receiver to the sender. The code is controlled again. */
-    socket.on("initDownload", function(inputedCode) {
+    socket.on("initDownload", function(inputedCode, isRestart) {
         var transferMetaData = transferMetaDataMap.get(inputedCode)
         console.log("download initialization request from socket "+socket.id+" to socket ",transferMetaData.roomHostSocket.id);
         if (transferMetaData == undefined) return;
         var receiverID = socket.id;
-        socket.to(transferMetaData.roomHostSocket.id).emit("initDownload",receiverID);
+        socket.to(transferMetaData.roomHostSocket.id).emit("initDownload", receiverID, isRestart);
     });
 
     /* An SDP offer is relayed from the sender to the receiver */

@@ -224,6 +224,5 @@ function iceConnectionStateChange_B(event) {
 socket.on("socketsReconnected", function(senderID) {
 	currentSenderID = senderID;
 	console.log("Sockets : updated sender socket : ",senderID,"\n relaunching download");
-	socket.emit("joinRoom", getInput(true));
-	socket.emit("initDownload", getInput(true));
+	socket.emit("initDownload", getInput(true), true);
 });

@@ -55,8 +55,10 @@ socket.on("receiverJoined", function (receiverID) {
  *  The server gives notice of a download initialization request.
  * 	Starts a new P2P connection and creates a DataChannel.
  */
-socket.on("initDownload", function() {
+socket.on("initDownload", function(receiverID, isRestart) {
 	console.log("Socket : initializing download");
+	if (isRestart)
+		currentReceiverID = receiverID;
 	senderConnection = new RTCPeerConnection({
 		iceServers: iceServers,
 		certificates: [senderCertificate]
