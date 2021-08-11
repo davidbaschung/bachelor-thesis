@@ -31,24 +31,23 @@ function sendFileAsync(file) {
      */
     reader.onload = async function(event) {
         var result = event.target.result;
-        if ( ! readyForSending) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
-            console.log("Buffer Recovery activated");
-            recoveredBuffer = [];
-            const OFFSET_T0 = offset - senderDataChannel.bufferedAmount;
-            const SLICESCOUNT = senderDataChannel.bufferedAmount/BYTESPERCHUNK;
-            for (var i=0; i<SLICESCOUNT; i++) {
-                chunkLocation = OFFSET_T0 + i * BYTESPERCHUNK;
-                var recoveryReader = new FileReader();
-                recoveryReader.onload = (rec) => recoveredBuffer.push(rec);
-                var slice = file.slice(chunkLocation, chunkLocation+BYTESPERCHUNK);
-                recoveryReader.readAsArrayBuffer(slice);
-            }
-            while ( ! readyForSending )
-                await asyncSleep(50);
-        }
         if (senderDataChannel == null) return;
-        while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT)
+        while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT
+            || ! readyForSending ) {
+                if ( ! readyForSending && recoveredBuffer==[]) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
+                    console.log("Buffer Recovery activated");
+                    const OFFSET_T0 = offset - senderDataChannel.bufferedAmount;
+                    const SLICESCOUNT = senderDataChannel.bufferedAmount/BYTESPERCHUNK;
+                    for (var i=0; i<SLICESCOUNT; i++) {
+                        chunkLocation = OFFSET_T0 + i * BYTESPERCHUNK;
+                        var recoveryReader = new FileReader();
+                        recoveryReader.onload = (rec) => recoveredBuffer.push(rec);
+                        var slice = file.slice(chunkLocation, chunkLocation+BYTESPERCHUNK);
+                        recoveryReader.readAsArrayBuffer(slice);
+                    }
+                }
                 await asyncSleep(50);
+            }
         senderDataChannel.send(result);
         offset += result.byteLength;
         if (offset < file.size) {
@@ -100,4 +99,5 @@ function restoreDataChannel() {
     for (var e in recoveredBuffer)
         senderDataChannel.send(e);
     readyForSending = true;
+    recoveredBuffer = [];
 }
