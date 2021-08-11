@@ -204,10 +204,11 @@ function iceConnectionStateChange_B(event) {
 			if (count < MAXCOUNT) {
 				asyncSleep(1000).then(() => {
 					if (count>=10 && count%5==0) {
-						socket.close();
-						socket = io.connect(url);
+						// socket.close();
+						// socket = io.connect(url);
 						socket.emit("restoreConnection", getInput(true), false);
-						console.log("New socket created");
+						// console.log("New socket created");
+						console.log("Socket state : "+socket.connected);
 					}
 					checkConnectivity(++count);
 				});
