@@ -32,6 +32,7 @@ function sendFileAsync(file) {
     reader.onload = async function(event) {
         var result = event.target.result;
         if ( ! readyForSending) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
+            console.log("Buffer Recovery activated");
             recoveredBuffer = [];
             const OFFSET_T0 = offset - senderDataChannel.bufferedAmount;
             const SLICESCOUNT = senderDataChannel.bufferedAmount/BYTESPERCHUNK;
