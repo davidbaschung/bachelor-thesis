@@ -34,7 +34,7 @@ function sendFileAsync(file) {
         if (senderDataChannel == null) return;
         while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT
             || ! readyForSending ) {
-                if ( ! readyForSending && recoveredBuffer==[]) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
+                if ( ! readyForSending && recoveredBuffer.length==0) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
                     console.log("Buffer Recovery activated");
                     const OFFSET_T0 = offset - senderDataChannel.bufferedAmount;
                     const SLICESCOUNT = senderDataChannel.bufferedAmount/BYTESPERCHUNK;
