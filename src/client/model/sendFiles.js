@@ -31,7 +31,7 @@ function sendFileAsync(file) {
      */
     reader.onload = async function(event) {
         var result = event.target.result;
-        if (senderDataChannel == null) return;
+        if (senderDataChannel == null) await asyncSleep(50);
         while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT
             || ! readyForSending ) {
                 if ( ! readyForSending && recoveredBuffer.length==0) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
