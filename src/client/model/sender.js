@@ -204,8 +204,15 @@ function iceConnectionStateChange_A(event) {
 						console.log("RTC+Socket : connection lost, reconnecting");
 						readyForSending = false;
 						senderDataChannel.close();
-						while (senderDataChannel != null) //.readyState != WebSocket.CLOSED)
-							syncSleep(50);
+						// while (senderDataChannel != null) //.readyState != WebSocket.CLOSED)
+						function waitClosed(timeMillis) {
+							if (senderDataChannel != null) {
+								asyncSleep(timeMillis).then( () => {
+									asyncSleepCheckLoop(timeMillis);
+								});
+							}
+						}
+						waitClosed(50);
 						// socket = io.connect(url, {"force new connection":true});
 						// console.log("Socket : new socket created : ",socket.id);
 						console.log("Socket state : "+socket.connected);

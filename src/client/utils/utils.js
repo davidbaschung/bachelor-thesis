@@ -20,7 +20,7 @@ function xpath(xpath, context) {
 
 /**
  * Copy the given string to the user's OS clipboard
- * @param {Strin} str - string to copy
+ * @param {String} str - string to copy
  */
 function copyToClipboard(str) {
     var l = document.createElement("textarea");
@@ -34,24 +34,12 @@ function copyToClipboard(str) {
 
 /**
  * Asynchronous way to pause the execution
- * @param {number} timeMillis - waiting time in milliseconds
+ * @param {Number} timeMillis - waiting time in milliseconds
  * @returns A promise that the caller must "await"
  */
  async function asyncSleep(timeMillis) {
     return new Promise((resolve => setTimeout(resolve,timeMillis)));
 }
-
-/**
- * Synchronous way to pause the execution
- * @param {number} timeMillis - waiting time in milliseconds
- */
-function syncSleep(timeMillis) {
-    var startTimeMillis = Date.now();
-    var currentTimeMillis = null;
-    do {
-      currentTimeMillis = Date.now();
-    } while (currentTimeMillis - startTimeMillis < timeMillis);
-  }
 
 /**
  * Converts a certificate fingerprint to a code / passphrase of 4 words.
