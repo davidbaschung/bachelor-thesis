@@ -203,18 +203,19 @@ function iceConnectionStateChange_A(event) {
 					if (count>0 && count%10==0) {
 						console.log("RTC+Socket : connection lost, reconnecting");
 						readyForSending = false;
-						senderDataChannel.close().then( () => {
-							// socket = io.connect(url, {"force new connection":true});
-							// console.log("Socket : new socket created : ",socket.id);
-							console.log("Socket state : "+socket.connected);
-							socket.emit("restoreConnection", getCodeLabel(true), true);
-							return;
-						});
+						senderDataChannel.close();
+						while (senderDataChannel.readyState != WebSocket.CLOSED)
+							await asyncSleep(50);
+						// socket = io.connect(url, {"force new connection":true});
+						// console.log("Socket : new socket created : ",socket.id);
+						console.log("Socket state : "+socket.connected);
+						socket.emit("restoreConnection", getCodeLabel(true), true);
+						return;
 					}
 					checkConnectivity(++count);
 				});
 			} else {
-				closeReceivingDC();
+				senderDataChannel.close();
 				setFeedback(false,"The connection failed, download cancelled.",colors.RED);
 			}
 		}
