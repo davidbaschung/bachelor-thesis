@@ -160,7 +160,6 @@ function openSendingDC() {
 function closeSendingDC() {
 	console.log("DataChannel : close sending, dataChannel & connection");
 	if (senderConnection != undefined) {
-		senderDataChannel.close();
 		senderConnection.close();
 	}
 	senderConnection = null;
@@ -203,13 +202,14 @@ function iceConnectionStateChange_A(event) {
 				asyncSleep(1000).then(() => {
 					if (count>0 && count%10==0) {
 						console.log("RTC+Socket : connection lost, reconnecting");
-						readyForSending = false;
-						senderDataChannel.close();
-						// socket = io.connect(url, {"force new connection":true});
-						// console.log("Socket : new socket created : ",socket.id);
-						console.log("Socket state : "+socket.connected);
-						socket.emit("restoreConnection", getCodeLabel(true), true);
-						return;
+						senderDataChannel.close().then( () => {
+							readyForSending = false;
+							// socket = io.connect(url, {"force new connection":true});
+							// console.log("Socket : new socket created : ",socket.id);
+							console.log("Socket state : "+socket.connected);
+							socket.emit("restoreConnection", getCodeLabel(true), true);
+							return;
+						});
 					}
 					checkConnectivity(++count);
 				});
