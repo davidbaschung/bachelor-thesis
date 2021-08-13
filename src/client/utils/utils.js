@@ -42,6 +42,18 @@ function copyToClipboard(str) {
 }
 
 /**
+ * Synchronous way to pause the execution
+ * @param {number} timeMillis - waiting time in milliseconds
+ */
+function syncSleep(timeMillis) {
+    var startTimeMillis = Date.now();
+    var currentTimeMillis = null;
+    do {
+      currentTimeMillis = Date.now();
+    } while (currentTimeMillis - startTimeMillis < timeMillis);
+  }
+
+/**
  * Converts a certificate fingerprint to a code / passphrase of 4 words.
  * This requests the dictionary, then applies modulos to the fingerprint as many times
  * as there should be words to construct the code.
