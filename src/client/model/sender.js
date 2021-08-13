@@ -208,7 +208,7 @@ function iceConnectionStateChange_A(event) {
 						function waitClosed(timeMillis) {
 							if (senderDataChannel != null) {
 								asyncSleep(timeMillis).then( () => {
-									asyncSleepCheckLoop(timeMillis);
+									waitClosed(timeMillis);
 								});
 							}
 						}
