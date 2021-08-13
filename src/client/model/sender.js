@@ -202,8 +202,8 @@ function iceConnectionStateChange_A(event) {
 				asyncSleep(1000).then(() => {
 					if (count>0 && count%10==0) {
 						console.log("RTC+Socket : connection lost, reconnecting");
+						readyForSending = false;
 						senderDataChannel.close().then( () => {
-							readyForSending = false;
 							// socket = io.connect(url, {"force new connection":true});
 							// console.log("Socket : new socket created : ",socket.id);
 							console.log("Socket state : "+socket.connected);
