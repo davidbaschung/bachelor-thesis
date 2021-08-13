@@ -54,6 +54,7 @@ function sendFileAsync(file) {
         if (offset < file.size) {
             readNextSlice(offset);
         } else {
+            console.log("Offset : ", offset, " , File size : ", file.size);
             sendFilesAsyncCallback(file);
         }
     };
