@@ -39,9 +39,9 @@ function sendFileAsync(file) {
                     const OFFSET_T0 = offset - senderDataChannel.bufferedAmount;
                     const SLICESCOUNT = senderDataChannel.bufferedAmount/BYTESPERCHUNK;
                     var recoveryReader = new FileReader();
+                    recoveryReader.onload = (rec) => recoveredBuffer.push(rec.target.result);
                     for (var i=0; i<SLICESCOUNT; i++) {
-                        chunkLocation = OFFSET_T0 + i * BYTESPERCHUNK;
-                        recoveryReader.onload = (rec) => recoveredBuffer.push(rec.target.result);
+                        var chunkLocation = OFFSET_T0 + i * BYTESPERCHUNK;
                         var slice = file.slice(chunkLocation, chunkLocation+BYTESPERCHUNK);
                         recoveryReader.readAsArrayBuffer(slice);
                     }
