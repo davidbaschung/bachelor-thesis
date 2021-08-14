@@ -37,25 +37,37 @@ function sendFileAsync(file) {
                 if ( ! readyForSending && recoveredBuffer.length==0) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
                     console.log("Buffer Recovery activated");
                     const OFFSET_T0 = offset - senderDataChannel.bufferedAmount;
-                    const SLICESCOUNT = senderDataChannel.bufferedAmount/BYTESPERCHUNK;
-                    function waitClosed(timeMillis) {
-                        if (reader.readyState == reader.LOADING) {
-                            asyncSleep(timeMillis).then( () => {
-                                waitClosed(timeMillis);
-                            });
-                        }
-                    }
-                    waitClosed(50);
-                    reader = null;
+                    const RECOVERYAMOUNT = senderDataChannel.bufferedAmount;
+                    // function waitClosed(timeMillis) {
+                    //     if (reader.readyState == reader.LOADING) {
+                    //         asyncSleep(timeMillis).then( () => {
+                    //             waitClosed(timeMillis);
+                    //         });
+                    //     }
+                    // }
+                    // waitClosed(50);
+                    // reader = null;
                     var recoveryReader = new FileReader();
-                    recoveryReader.onload = (rec) => recoveredBuffer.push(rec.target.result);
-                    for (var i=0; i<SLICESCOUNT; i++) {
-                        var chunkLocation = OFFSET_T0 + i * BYTESPERCHUNK;
-                        var slice = file.slice(chunkLocation, chunkLocation+BYTESPERCHUNK);
-                        recoveryReader.readAsArrayBuffer(slice);
+                    var recoveryOffset = OFFSET_T0; //TODO simplifier
+                    recoveryReader.onload = (recoveryResult) => {
+                        recoveredBuffer.push(recoveryResult.target.result);
+                        if (recoveryOffset<RECOVERYAMOUNT) {
+                            recoveryOffset += recoveryResult.byteLength;
+                            recoveryReader.readAsArrayBuffer(recSlice);
+                        }
+                    };
+                    function recoverNextSlice() {
+                        var recoverySlice = file.slice(recoveryOffset, recoveryOffset + BYTESPERCHUNK);
+                        recoveryReader.readAsArrayBuffer(recoverySlice);
                     }
+                    recoverNextSlice(0);
+                    // for (var i=0; i<SLICESCOUNT; i++) {
+                    //     var chunkLocation = OFFSET_T0 + i * BYTESPERCHUNK;
+                    //     var recSlice = file.slice(chunkLocation, chunkLocation+BYTESPERCHUNK);
+                    //     recoveryReader.readAsArrayBuffer(recSlice);
+                    // }
                     recoveryReader.close();
-                    reader = new FileReader();
+                    // reader = new FileReader();
                 }
                 await asyncSleep(50);
             }
