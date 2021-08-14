@@ -66,7 +66,6 @@ function sendFileAsync(file) {
                     //     var recSlice = file.slice(chunkLocation, chunkLocation+BYTESPERCHUNK);
                     //     recoveryReader.readAsArrayBuffer(recSlice);
                     // }
-                    recoveryReader.close();
                     // reader = new FileReader();
                 }
                 await asyncSleep(50);
