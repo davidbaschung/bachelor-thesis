@@ -69,6 +69,7 @@ function sendFileAsync(file) {
                     // reader = new FileReader();
                 }
                 await asyncSleep(50);
+                if (senderDataChannel == null) await asyncSleep(50);
             }
         senderDataChannel.send(result);
         offset += result.byteLength;
