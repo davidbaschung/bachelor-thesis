@@ -38,7 +38,15 @@ function sendFileAsync(file) {
                     console.log("Buffer Recovery activated");
                     const OFFSET_T0 = offset - senderDataChannel.bufferedAmount;
                     const SLICESCOUNT = senderDataChannel.bufferedAmount/BYTESPERCHUNK;
-                    reader.close();
+                    function waitClosed(timeMillis) {
+                        if (reader.readyState == reader.LOADING) {
+                            asyncSleep(timeMillis).then( () => {
+                                waitClosed(timeMillis);
+                            });
+                        }
+                    }
+                    waitClosed(50);
+                    reader = null;
                     var recoveryReader = new FileReader();
                     recoveryReader.onload = (rec) => recoveredBuffer.push(rec.target.result);
                     for (var i=0; i<SLICESCOUNT; i++) {
