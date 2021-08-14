@@ -34,9 +34,10 @@ function sendFileAsync(file) {
         if (senderDataChannel == null) await asyncSleep(50);
         while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT
             || ! readyForSending ) {
+                await asyncSleep(100); // TODO remove
                 if ( ! readyForSending && recoveredBuffer.length==0) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
-                    console.log("Buffer Recovery activated");
                     const OFFSET_T0 = offset - senderDataChannel.bufferedAmount;
+                    console.log("Buffer Recovery activated.  offset:",offset," bufferdAmount:",senderDataChannel.bufferedAmount," OFFSET_T0:",OFFSET_T0);
                     const RECOVERYAMOUNT = senderDataChannel.bufferedAmount;
                     // function waitClosed(timeMillis) {
                     //     if (reader.readyState == reader.LOADING) {
@@ -67,9 +68,9 @@ function sendFileAsync(file) {
                     //     recoveryReader.readAsArrayBuffer(recSlice);
                     // }
                     // reader = new FileReader();
+                    if (senderDataChannel == null) await asyncSleep(50);
                 }
                 await asyncSleep(50);
-                if (senderDataChannel == null) await asyncSleep(50);
             }
         senderDataChannel.send(result);
         offset += result.byteLength;
