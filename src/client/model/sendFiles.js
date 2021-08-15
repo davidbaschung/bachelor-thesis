@@ -77,8 +77,8 @@ function sendFileAsync(file) {
             console.log("channel still not open");
             await asyncSleep(50);
         }
-        while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT);
-            await asyncSleep(50);
+        while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT)
+            await asyncSleep(10);
         senderDataChannel.send(result);
         offset += result.byteLength;
         if (offset < file.size) {
