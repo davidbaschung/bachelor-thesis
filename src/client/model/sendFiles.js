@@ -19,7 +19,7 @@ function sendFilesAsync() {
  * Loads the file in small chunks, and buffers them in the DataChannel for sending.
  * @param {File} file - The file to send
  */
-function sendFileAsync(file) {
+async function sendFileAsync(file) {
     if (senderDataChannel == null || file == undefined) return;
     console.log("Sending of file "+file.name+" begins");
     var offset = 0;
