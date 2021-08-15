@@ -30,6 +30,7 @@ function sendFileAsync(file) {
      * @param {ProgressEvent} event - Contains the loaded targeted data
      */
     reader.onload = async function(event) {
+        console.log("New load. offset : ",offset);
         var result = event.target.result;
         if ( ! readyForSending && recoveredBuffer.length==0 && offset!=0) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
             const OFFSET_T0 = offset - senderDataChannel.bufferedAmount;
@@ -77,7 +78,7 @@ function sendFileAsync(file) {
             await asyncSleep(10);
         }
         while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT);
-            await asyncSleep(10);
+            await asyncSleep(50);
         senderDataChannel.send(result);
         offset += result.byteLength;
         if (offset < file.size) {
