@@ -68,8 +68,14 @@ function sendFileAsync(file) {
             while ( ! readyForSending ) await asyncSleep(100);
         }
         // await asyncSleep(50);
-        while (senderDataChannel == null) await asyncSleep(10);
-        while (senderDataChannel.readyState != 'open') await asyncSleep(10);
+        while (senderDataChannel == null) {
+            console.log("channel still null");
+            await asyncSleep(10);
+        }
+        while (senderDataChannel.readyState != 'open') {
+            console.log("channel still not open");
+            await asyncSleep(10);
+        }
         while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT);
             await asyncSleep(10);
         senderDataChannel.send(result);
