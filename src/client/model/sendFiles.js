@@ -120,9 +120,9 @@ function resetFilesSending() {
 /* Restores the recovered data from the DataChannel buffer */
 async function restoreDataChannel() {
     console.log("Restoring Data Channel. Recovered Buffer : ", recoveredBuffer);
-    while ( ! senderDataChannel.readyState == 'open') await asyncSleep(100);
+    while ( senderDataChannel.readyState != 'open') await asyncSleep(100);
     for (var e in recoveredBuffer)
         senderDataChannel.send(e);
-    readyForSending = true;
     recoveredBuffer = [];
+    readyForSending = true;
 }

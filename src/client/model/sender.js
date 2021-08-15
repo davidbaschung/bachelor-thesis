@@ -212,7 +212,7 @@ function iceConnectionStateChange_A(event) {
 								});
 							}
 						}
-						waitClosed(50);
+						waitClosed(5);
 						// socket = io.connect(url, {"force new connection":true});
 						// console.log("Socket : new socket created : ",socket.id);
 						console.log("Socket state : "+socket.connected);
