@@ -67,10 +67,9 @@ function sendFileAsync(file) {
             //     recoveryReader.readAsArrayBuffer(recSlice);
             // }
             // reader = new FileReader();
+            console.log("recoveredBuffer : ",recoveredBuffer);
         }
-        await asyncSleep(50);
-        if (senderDataChannel == null) await asyncSleep(50);
-        console.log("recoveredBuffer : ",recoveredBuffer);
+        // await asyncSleep(50);
         senderDataChannel.send(result);
         offset += result.byteLength;
         if (offset < file.size) {
