@@ -19,7 +19,7 @@ function sendFilesAsync() {
  * Loads the file in small chunks, and buffers them in the DataChannel for sending.
  * @param {File} file - The file to send
  */
-async function sendFileAsync(file) {
+function sendFileAsync(file) {
     if (senderDataChannel == null || file == undefined) return;
     console.log("Sending of file "+file.name+" begins");
     var offset = 0;
@@ -68,6 +68,8 @@ async function sendFileAsync(file) {
             while ( ! readyForSending ) await asyncSleep(100);
         }
         // await asyncSleep(50);
+        while (senderDataChannel == null) await asyncSleep(10);
+        while (senderDataChannel.readyState != 'open') await asyncSleep(10);
         while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT);
             await asyncSleep(10);
         senderDataChannel.send(result);
@@ -90,9 +92,6 @@ async function sendFileAsync(file) {
         var slice = file.slice(offset, offset + BYTESPERCHUNK);
         reader.readAsArrayBuffer(slice);
     }
-
-    while (senderDataChannel == null) await asyncSleep(10);
-    while (senderDataChannel.readyState != 'open') await asyncSleep(10);
     readNextSlice(0); /* loading initialization */
     console.log("Sending of file "+file.name+" finished");
 }
