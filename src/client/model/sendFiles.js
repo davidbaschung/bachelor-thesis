@@ -68,7 +68,7 @@ function sendFileAsync(file) {
             console.log("recoveredBuffer : ",recoveredBuffer);
             while ( ! readyForSending ) await asyncSleep(100);
         }
-        await asyncSleep(50); // TODO keep?
+        // await asyncSleep(50); // TODO keep?
         while (senderDataChannel == null) {
             console.log("channel still null");
             await asyncSleep(10);
