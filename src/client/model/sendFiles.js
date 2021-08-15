@@ -68,9 +68,9 @@ function sendFileAsync(file) {
                     //     recoveryReader.readAsArrayBuffer(recSlice);
                     // }
                     // reader = new FileReader();
-                    if (senderDataChannel == null) await asyncSleep(50);
                 }
                 await asyncSleep(50);
+                if (senderDataChannel == null) await asyncSleep(50);
             }
         senderDataChannel.send(result);
         offset += result.byteLength;
