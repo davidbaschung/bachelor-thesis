@@ -91,8 +91,8 @@ async function sendFileAsync(file) {
         reader.readAsArrayBuffer(slice);
     }
 
-    while (senderDataChannel == null) await asyncSleep(50);
-    while (senderDataChannel.readyState != 'open') await asyncSleep(50);
+    while (senderDataChannel == null) await asyncSleep(10);
+    while (senderDataChannel.readyState != 'open') await asyncSleep(10);
     readNextSlice(0); /* loading initialization */
     console.log("Sending of file "+file.name+" finished");
 }
