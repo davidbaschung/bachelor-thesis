@@ -71,11 +71,11 @@ function sendFileAsync(file) {
         // await asyncSleep(50); // TODO keep?
         while (senderDataChannel == null) {
             console.log("channel still null");
-            await asyncSleep(10);
+            await asyncSleep(50);
         }
         while (senderDataChannel.readyState != 'open') {
             console.log("channel still not open");
-            await asyncSleep(10);
+            await asyncSleep(50);
         }
         while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT);
             await asyncSleep(50);
