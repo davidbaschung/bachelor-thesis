@@ -205,16 +205,19 @@ function iceConnectionStateChange_A(event) {
 						readyForSending = false;
 						senderDataChannel.close();
 						// while (senderDataChannel != null) //.readyState != WebSocket.CLOSED)
-						function waitClosed(timeMillis) {
-							if (senderDataChannel != null) {
-								asyncSleep(timeMillis).then( () => {
-									waitClosed(timeMillis);
-								});
-							}
-						}
-						waitClosed(5);
+
+						// function waitClosed(timeMillis) {
+						// 	if (senderDataChannel != null) {
+						// 		asyncSleep(timeMillis).then( () => {
+						// 			waitClosed(timeMillis);
+						// 		});
+						// 	}
+						// }
+						// waitClosed(5);
+
 						// socket = io.connect(url, {"force new connection":true});
 						// console.log("Socket : new socket created : ",socket.id);
+
 						console.log("Socket state : "+socket.connected);
 						socket.emit("restoreConnection", getCodeLabel(true), true);
 						return;
