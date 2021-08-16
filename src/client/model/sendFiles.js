@@ -32,7 +32,7 @@ function sendFileAsync(file) {
     reader.onload = async function(event) {
         // console.log("New load. offset : ",offset);
         var result = event.target.result;
-        if ( ! readyForSending && recoveredBuffer.length==0 && offset!=0) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
+        if ( ! readyForSending /*&& recoveredBuffer.length==0 && offset!=0*/) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
             const OFFSET_T0 = offset - senderDataChannel.bufferedAmount;
             console.log("Buffer Recovery activated.  offset:",offset," bufferdAmount:",senderDataChannel.bufferedAmount," OFFSET_T0:",OFFSET_T0);
             const RECOVERYAMOUNT = senderDataChannel.bufferedAmount;
@@ -65,7 +65,7 @@ function sendFileAsync(file) {
             //     recoveryReader.readAsArrayBuffer(recSlice);
             // }
             // reader = new FileReader();
-            console.log("recoveredBuffer : ",recoveredBuffer);
+            console.log("Just recovered Buffer : ",recoveredBuffer);
             while ( ! readyForSending ) await asyncSleep(100);
         }
         // await asyncSleep(50); // TODO keep?

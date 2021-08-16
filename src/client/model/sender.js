@@ -153,7 +153,7 @@ function openSendingDC() {
 	setResetButtonLabel("cancel");
 	setFeedback(false, "","");
 	readyForSending ? sendFilesAsync() : restoreDataChannel();
-	sendFileAsync();
+	// sendFileAsync();
 }
 
 /* Closes files sending. Called by the DataChannel on closing. */
