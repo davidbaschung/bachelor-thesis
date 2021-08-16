@@ -41,6 +41,8 @@ function sendFileAsync(file) {
             console.log("channel still not open");
             await asyncSleep(50);
         }
+        while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT && readyForSending)
+            await asyncSleep(10);
         if ( ! readyForSending /*&& recoveredBuffer.length==0 && offset!=0*/) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
             const OFFSET_T0 = offset - senderDataChannel.bufferedAmount;
             console.log("Buffer Recovery activated.  offset:",offset," bufferdAmount:",senderDataChannel.bufferedAmount," OFFSET_T0:",OFFSET_T0);
@@ -77,8 +79,6 @@ function sendFileAsync(file) {
             console.log("Just recovered Buffer : ",recoveredBuffer);
             while ( ! readyForSending ) await asyncSleep(100);
         }
-        while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT)
-            await asyncSleep(10);
         senderDataChannel.send(result);
         offset += result.byteLength;
         if (offset < file.size) {
