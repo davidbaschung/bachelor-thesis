@@ -36,8 +36,8 @@ function sendFileAsync(file) {
         while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT && readyForSending)
             await asyncSleep(10);
         if ( ! readyForSending /*&& recoveredBuffer.length==0 && offset!=0*/) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
-            const OFFSET_T0 = offset - senderDataChannel.bufferedAmount;
-            console.log("Buffer Recovery activated.  offset:",offset," bufferedAmount:",senderDataChannel.bufferedAmount," OFFSET_T0:",OFFSET_T0);
+            const UNBUFFEREDOFFSET = offset - senderDataChannel.bufferedAmount;
+            console.log("Buffer Recovery activated.  offset:",offset," bufferedAmount:",senderDataChannel.bufferedAmount," OFFSET_T0:",UNBUFFEREDOFFSET);
             const RECOVERYAMOUNT = senderDataChannel.bufferedAmount;
             // function waitClosed(timeMillis) {
             //     if (reader.readyState == reader.LOADING) {
@@ -49,16 +49,19 @@ function sendFileAsync(file) {
             // waitClosed(50);
             // reader = null;
             var recoveryReader = new FileReader();
-            var recoveryOffset = OFFSET_T0; //TODO simplifier
+            var recoveryOffset = UNBUFFEREDOFFSET; //TODO simplifier
             recoveryReader.onload = (recoveryEvent) => {
                 recoveryResult = recoveryEvent.target.result;
                 // console.log("another recovery loading. offset:",offset," bufferedAmount:",senderDataChannel.bufferedAmount," OFFSET_T0:",OFFSET_T0," bytelength:",recoveryResult.byteLength);
                 recoveredBuffer.push(recoveryResult);
-                if (recoveryOffset-OFFSET_T0 < RECOVERYAMOUNT) {
+                // if (recoveredAmount<100000)
+                var recoveredAmount = recoveryOffset-UNBUFFEREDOFFSET;
+                console.log(recoveredAmount)
+                if (recoveredAmount < RECOVERYAMOUNT) { // TODO bon nombre push?
                     recoveryOffset += recoveryResult.byteLength;
                     recoverNextSlice();
                 }
-            };
+            }; 
             function recoverNextSlice() {
                 var recoverySlice = file.slice(recoveryOffset, recoveryOffset + BYTESPERCHUNK);
                 recoveryReader.readAsArrayBuffer(recoverySlice);
