@@ -51,7 +51,7 @@ function sendFileAsync(file) {
             var recoveryReader = new FileReader();
             var recoveryOffset = OFFSET_T0; //TODO simplifier
             recoveryReader.onload = (recoveryResult) => {
-                console.log("another recovery loading");
+                console.log("another recovery loading. offset:",offset," bufferedAmount:",senderDataChannel.bufferedAmount," OFFSET_T0:",OFFSET_T0," bytelength:",recoveryResult.byteLength);
                 recoveredBuffer.push(recoveryResult.target.result);
                 if (recoveryOffset-OFFSET_T0 < RECOVERYAMOUNT) {
                     recoveryOffset += recoveryResult.byteLength;
