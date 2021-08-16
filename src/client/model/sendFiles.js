@@ -52,7 +52,7 @@ function sendFileAsync(file) {
             var recoveryOffset = OFFSET_T0; //TODO simplifier
             recoveryReader.onload = (recoveryResult) => {
                 recoveredBuffer.push(recoveryResult.target.result);
-                if (recoveryOffset<RECOVERYAMOUNT) {
+                if (recoveryOffset-OFFSET_T0<RECOVERYAMOUNT) {
                     recoveryOffset += recoveryResult.byteLength;
                     recoverNextSlice();
                 }
