@@ -135,7 +135,7 @@ async function restoreDataChannel() {
     while ( senderDataChannel.readyState != 'open') await asyncSleep(100);
     for (var e in recoveredBuffer) {
         senderDataChannel.send(e);
-        // await asyncSleep(1); // /!\ ne delay pas l'envoi
+        await asyncSleep(1);
     }
     recoveredBuffer = [];
     readyForSending = true;

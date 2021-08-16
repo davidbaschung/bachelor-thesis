@@ -46,6 +46,7 @@ function receiveChunks(loadOfChunks) {
         nextFile = false;
     } else {     /* download of a file (last steps) + download of next file (first steps)   */
         console.log("file size:",file.size,", blob size:",new Blob(currentReceiveBuffer).size,", received size:",receivedSize,", length:",length);
+        console.log("loadOfChunks:",loadOfChunks);
         var remainingSize = file.size - receivedSize;
         var remainingChunks = loadOfChunks.slice(0,remainingSize);
         var nextFileChunks = loadOfChunks.slice(remainingSize, loadOfChunks.byteLength);
