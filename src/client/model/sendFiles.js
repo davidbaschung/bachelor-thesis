@@ -136,7 +136,6 @@ async function restoreDataChannel() {
     recoveredBuffer.forEach( (e) => {
         console.log(e);
         senderDataChannel.send(e);
-        await asyncSleep(1);
     });
     recoveredBuffer = [];
     readyForSending = true;
