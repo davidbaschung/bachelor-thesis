@@ -58,7 +58,7 @@ function sendFileAsync(file) {
                 // if (recoveredAmount<100000)
                 var recoveredAmount = recoveryOffset-UNBUFFEREDOFFSET;
                 if (recoveredAmount < RECOVERYAMOUNT) { // TODO bon nombre push?
-                    console.log("recoveredAmount:",recoveredAmount," on ",RECOVERYAMOUNT,". Loading next slice");
+                    // console.log("recoveredAmount:",recoveredAmount," on ",RECOVERYAMOUNT,". Loading next slice");
                     recoverNextSlice();
                 }
             }; 
@@ -131,9 +131,10 @@ function resetFilesSending() {
 
 /* Restores the recovered data from the DataChannel buffer */
 async function restoreDataChannel() {
-    console.log("Restoring Data Channel. Recovered Buffer : ", recoveredBuffer);
+    console.log("Restoring Data Channel");
     while ( senderDataChannel.readyState != 'open') await asyncSleep(100);
     for (var e in recoveredBuffer)
+        console.log(e);
         senderDataChannel.send(e);
     recoveredBuffer = [];
     readyForSending = true;
