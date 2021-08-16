@@ -56,8 +56,8 @@ function sendFileAsync(file) {
                 recoveredBuffer.push(recoveryResult);
                 // if (recoveredAmount<100000)
                 var recoveredAmount = recoveryOffset-UNBUFFEREDOFFSET;
-                console.log(recoveredAmount)
                 if (recoveredAmount < RECOVERYAMOUNT) { // TODO bon nombre push?
+                    console.log("recoveredAmount:",recoveredAmount," on ",RECOVERYAMOUNT,". Loading next slice");
                     recoveryOffset += recoveryResult.byteLength;
                     recoverNextSlice();
                 }
@@ -73,15 +73,15 @@ function sendFileAsync(file) {
             //     recoveryReader.readAsArrayBuffer(recSlice);
             // }
             // reader = new FileReader();
-            console.log("Just recovered Buffer : ",recoveredBuffer);
+            console.log("Just recovered Buffer : ",recoveredBuffer," length:",recoveredBuffer.length);
             while ( ! readyForSending ) await asyncSleep(100);
         }
         while (senderDataChannel == null) {
-            console.log("channel still null");
+            // console.log("channel still null");
             await asyncSleep(50);
         }
         while (senderDataChannel.readyState != 'open') {
-            console.log("channel still not open");
+            // console.log("channel still not open");
             await asyncSleep(50);
         }
         senderDataChannel.send(result);
