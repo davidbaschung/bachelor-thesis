@@ -50,10 +50,10 @@ function sendFileAsync(file) {
             // reader = null;
             var recoveryReader = new FileReader();
             var recoveryOffset = OFFSET_T0; //TODO simplifier
-            recoveryReader.onload = (recoveryResult) => {
+            recoveryReader.onload = (recoveryArrayBuffer) => {
                 recoveredBuffer.push(recoveryResult.target.result);
                 if (recoveryOffset-OFFSET_T0<RECOVERYAMOUNT) {
-                    recoveryOffset += recoveryResult.byteLength;
+                    recoveryOffset += recoveryArrayBuffer;
                     recoverNextSlice();
                 }
             };
