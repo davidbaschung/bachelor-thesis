@@ -51,14 +51,14 @@ function sendFileAsync(file) {
                 recoveredBuffer.push(recoveryResult.target.result);
                 if (recoveryOffset<RECOVERYAMOUNT) {
                     recoveryOffset += recoveryResult.byteLength;
-                    recoveryReader.readAsArrayBuffer(recSlice);
+                    recoverNextSlice();
                 }
             };
             function recoverNextSlice() {
                 var recoverySlice = file.slice(recoveryOffset, recoveryOffset + BYTESPERCHUNK);
                 recoveryReader.readAsArrayBuffer(recoverySlice);
             }
-            recoverNextSlice(0);
+            recoverNextSlice();
             // for (var i=0; i<SLICESCOUNT; i++) {
             //     var chunkLocation = OFFSET_T0 + i * BYTESPERCHUNK;
             //     var recSlice = file.slice(chunkLocation, chunkLocation+BYTESPERCHUNK);
@@ -82,7 +82,7 @@ function sendFileAsync(file) {
         senderDataChannel.send(result);
         offset += result.byteLength;
         if (offset < file.size) {
-            readNextSlice(offset);
+            readNextSlice();
         } else {
             console.log("Offset : ", offset, " , File size : ", file.size);
             sendFilesAsyncCallback(file);
@@ -99,7 +99,7 @@ function sendFileAsync(file) {
         var slice = file.slice(offset, offset + BYTESPERCHUNK);
         reader.readAsArrayBuffer(slice);
     }
-    readNextSlice(0); /* loading initialization */
+    readNextSlice(); /* loading initialization */
     console.log("Sending of file "+file.name+" finished");
 }
 
