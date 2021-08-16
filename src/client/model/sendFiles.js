@@ -133,10 +133,10 @@ function resetFilesSending() {
 async function restoreDataChannel() {
     console.log("Restoring Data Channel");
     while ( senderDataChannel.readyState != 'open') await asyncSleep(100);
-    for (var e in recoveredBuffer)
-        console.log(e);
+    for (var e in recoveredBuffer) {
         senderDataChannel.send(e);
-        await asyncSleep(1);
+        // await asyncSleep(1); // /!\ ne delay pas l'envoi
+    }
     recoveredBuffer = [];
     readyForSending = true;
 }
