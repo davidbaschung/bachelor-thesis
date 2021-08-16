@@ -54,11 +54,11 @@ function sendFileAsync(file) {
                 recoveryResult = recoveryEvent.target.result;
                 // console.log("another recovery loading. offset:",offset," bufferedAmount:",senderDataChannel.bufferedAmount," OFFSET_T0:",OFFSET_T0," bytelength:",recoveryResult.byteLength);
                 recoveredBuffer.push(recoveryResult);
+                recoveryOffset += recoveryResult.byteLength;
                 // if (recoveredAmount<100000)
                 var recoveredAmount = recoveryOffset-UNBUFFEREDOFFSET;
                 if (recoveredAmount < RECOVERYAMOUNT) { // TODO bon nombre push?
                     console.log("recoveredAmount:",recoveredAmount," on ",RECOVERYAMOUNT,". Loading next slice");
-                    recoveryOffset += recoveryResult.byteLength;
                     recoverNextSlice();
                 }
             }; 
