@@ -34,6 +34,14 @@ function sendFileAsync(file) {
         // console.log("New load. offset : ",offset);
         var result = event.target.result;
         // await asyncSleep(50); // TODO keep?
+        while (senderDataChannel == null) {
+            // console.log("channel still null");
+            await asyncSleep(50);
+        }
+        while (senderDataChannel.readyState != 'open') {
+            // console.log("channel still not open");
+            await asyncSleep(50);
+        }
         while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT && readyForSending)
             await asyncSleep(10);
         if ( ! readyForSending /*&& recoveredBuffer.length==0 && offset!=0*/) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
@@ -75,17 +83,9 @@ function sendFileAsync(file) {
             // }
             // reader = new FileReader();
             console.log("Just recovered Buffer : ",recoveredBuffer," length:",recoveredBuffer.length);
-            while (senderDataChannel == null) await asyncSleep(50);
-            while ( ! readyForSending || senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT)
+            // while (senderDataChannel == null) await asyncSleep(50);
+            while ( ! readyForSending);// || senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT)
                 await asyncSleep(100);
-        }
-        while (senderDataChannel == null) {
-            // console.log("channel still null");
-            await asyncSleep(50);
-        }
-        while (senderDataChannel.readyState != 'open') {
-            // console.log("channel still not open");
-            await asyncSleep(50);
         }
         senderDataChannel.send(result);
         offset += result.byteLength;
@@ -141,5 +141,7 @@ async function restoreDataChannel() {
         senderDataChannel.send(e);
     });
     recoveredBuffer = [];
+    while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT-BYTESPERCHUNK);
+        await asyncSleep(10);
     readyForSending = true;
 }
