@@ -45,45 +45,7 @@ function sendFileAsync(file) {
         while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT && readyForSending)
             await asyncSleep(10);
         if ( ! readyForSending /*&& recoveredBuffer.length==0 && offset!=0*/) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
-            const RECOVERYAMOUNT = offset - securedSize;
-            console.log("Buffer Recovery activated. offset:",offset," bufferedAmount:",senderDataChannel.bufferedAmount," securedSize:",securedSize);
-            // function waitClosed(timeMillis) {
-            //     if (reader.readyState == reader.LOADING) {
-            //         asyncSleep(timeMillis).then( () => {
-            //             waitClosed(timeMillis);
-            //         });
-            //     }
-            // }
-            // waitClosed(50);
-            // reader = null;
-            var recoveryReader = new FileReader();
-            console.log("T0:",offset-senderDataChannel.bufferedAmount,", securedSize:",securedSize);
-            var recoveryOffset = securedSize;
-            recoveryReader.onload = (recoveryEvent) => {
-                recoveryResult = recoveryEvent.target.result;
-                // console.log("another recovery loading. offset:",offset," bufferedAmount:",senderDataChannel.bufferedAmount," OFFSET_T0:",OFFSET_T0," bytelength:",recoveryResult.byteLength);
-                recoveredBuffer.push(recoveryResult);
-                recoveryOffset += recoveryResult.byteLength;
-                // if (recoveredAmount<100000)
-                var recoveredAmount = recoveryOffset-securedSize;
-                if (recoveredAmount < RECOVERYAMOUNT) { // TODO bon nombre push?
-                    // console.log("recoveredAmount:",recoveredAmount," on ",RECOVERYAMOUNT,". Loading next slice");
-                    recoverNextSlice();
-                }
-            }; 
-            function recoverNextSlice() {
-                var recoverySlice = file.slice(recoveryOffset, recoveryOffset + BYTESPERCHUNK);
-                recoveryReader.readAsArrayBuffer(recoverySlice);
-            }
-            recoverNextSlice();
-            // for (var i=0; i<SLICESCOUNT; i++) {
-            //     var chunkLocation = OFFSET_T0 + i * BYTESPERCHUNK;
-            //     var recSlice = file.slice(chunkLocation, chunkLocation+BYTESPERCHUNK);
-            //     recoveryReader.readAsArrayBuffer(recSlice);
-            // }
-            // reader = new FileReader();
-            console.log("Just recovered Buffer : ",recoveredBuffer," length:",recoveredBuffer.length);
-            // while (senderDataChannel == null) await asyncSleep(50);
+            
             while ( ! readyForSending);// || senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT)
                 await asyncSleep(100);
         }
@@ -135,6 +97,48 @@ function resetFilesSending() {
 /* Restores the recovered data from the DataChannel buffer */
 async function restoreDataChannel() {
     console.log("Restoring Data Channel");
+    const RECOVERYAMOUNT = offset - securedSize;
+    console.log("Buffer Recovery activated. offset:",offset," bufferedAmount:",senderDataChannel.bufferedAmount," securedSize:",securedSize);
+    // function waitClosed(timeMillis) {
+    //     if (reader.readyState == reader.LOADING) {
+    //         asyncSleep(timeMillis).then( () => {
+    //             waitClosed(timeMillis);
+    //         });
+    //     }
+    // }
+    // waitClosed(50);
+    // reader = null;
+    var recoveryReader = new FileReader();
+    console.log("T0:",offset-senderDataChannel.bufferedAmount,", securedSize:",securedSize);
+    var recoveryOffset = securedSize;
+    recoveryReader.onload = (recoveryEvent) => {
+        recoveryResult = recoveryEvent.target.result;
+        // console.log("another recovery loading. offset:",offset," bufferedAmount:",senderDataChannel.bufferedAmount," OFFSET_T0:",OFFSET_T0," bytelength:",recoveryResult.byteLength);
+        recoveredBuffer.push(recoveryResult);
+        recoveryOffset += recoveryResult.byteLength;
+        // if (recoveredAmount<100000)
+        var recoveredAmount = recoveryOffset-securedSize;
+        if (recoveredAmount < RECOVERYAMOUNT) { // TODO bon nombre push?
+            // console.log("recoveredAmount:",recoveredAmount," on ",RECOVERYAMOUNT,". Loading next slice");
+            recoverNextSlice();
+        }
+    }; 
+    function recoverNextSlice() {
+        var recoverySlice = file.slice(recoveryOffset, recoveryOffset + BYTESPERCHUNK);
+        recoveryReader.readAsArrayBuffer(recoverySlice);
+    }
+    recoverNextSlice();
+    // for (var i=0; i<SLICESCOUNT; i++) {
+    //     var chunkLocation = OFFSET_T0 + i * BYTESPERCHUNK;
+    //     var recSlice = file.slice(chunkLocation, chunkLocation+BYTESPERCHUNK);
+    //     recoveryReader.readAsArrayBuffer(recSlice);
+    // }
+    // reader = new FileReader();
+    console.log("Just recovered Buffer : ",recoveredBuffer," length:",recoveredBuffer.length);
+    // while (senderDataChannel == null) await asyncSleep(50);
+    
+
+
     while ( senderDataChannel.readyState != 'open') await asyncSleep(100);
     recoveredBuffer.forEach( (e) => {
         // console.log(e);

@@ -87,11 +87,11 @@ io.on("connection", function (socket) {
         socket.emit("codeAccepted", transferMetaDataMsg);
         var receiverID = socket.id;
         host.emit("receiverJoined", receiverID);
-    })
+    });
 
-    /* A download initialization request is relayed from the receiver to the sender. The code is controlled again. */
+    /* A download initialization request is relayed from the receiver to the sender. The receiver code is controlled again. */
     socket.on("initDownload", function(inputedCode, isRestart, receivedSize) {
-        var transferMetaData = transferMetaDataMap.get(inputedCode)
+        var transferMetaData = transferMetaDataMap.get(inputedCode);
         console.log("download initialization request from socket "+socket.id+" to socket ",transferMetaData.roomHostSocket.id);
         if (transferMetaData == undefined) return;
         var receiverID = socket.id;
@@ -118,7 +118,7 @@ io.on("connection", function (socket) {
      */
     socket.on("receiverAuthenticationFailed", function(receiverID) {
         socket.to(receiverID).emit("receiverAuthenticationFailed");
-    })
+    });
 
     /* An ICE Candidate is relayed from the sender to the receiver */
     socket.on("IceCandidateA", function (IceCandidateA, receiverID) {
@@ -135,7 +135,7 @@ io.on("connection", function (socket) {
     /* The receivers download status is relayed to the sender */
     socket.on("transferStatus", function (newStatus, senderID) {
         socket.to(senderID).emit("transferStatus", newStatus);
-    })
+    });
 
     /**
      * The sender and receiver will both ask for a reconnection
