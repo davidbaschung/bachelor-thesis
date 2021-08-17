@@ -21,7 +21,7 @@ function sendFilesAsync() {
  * Loads the file in small chunks, and buffers them in the DataChannel for sending.
  * @param {File} file - The file to send
  */
-function sendFileAsync(file) {
+async function sendFileAsync(file) {
     if (senderDataChannel == null || file == undefined) return;
     console.log("Sending of file "+file.name+" begins");
     offset = 0;
@@ -45,11 +45,11 @@ function sendFileAsync(file) {
         }
         while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT && readyForSending)
             await asyncSleep(10);
-        if ( ! readyForSending /*&& recoveredBuffer.length==0 && offset!=0*/) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
+        // if ( ! readyForSending /*&& recoveredBuffer.length==0 && offset!=0*/) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
             
             while ( ! readyForSending);// || senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT)
                 await asyncSleep(100);
-        }
+        // }
         senderDataChannel.send(result);
         offset += result.byteLength;
         if (offset < file.size) {
