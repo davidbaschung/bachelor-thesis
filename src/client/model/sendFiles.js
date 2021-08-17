@@ -4,6 +4,7 @@ const BYTESPERCHUNK = 16000;        /* Bytes size for loading and queuing in buf
 const MAXBUFFEREDAMOUNT = 16000000; /* Buffer max size, for Chrome                  */
 var filesToSendCount = 0;           /* Increment for files counting                 */
 var recoveredBuffer = [];           /* Recovery list for data in datachannel buffer */
+var offset = 0;                     /* The data size read and buffered              */
 var securedSize = 0;                /* The data size successfully transmitted       */
 
 /**
@@ -23,7 +24,7 @@ function sendFilesAsync() {
 function sendFileAsync(file) {
     if (senderDataChannel == null || file == undefined) return;
     console.log("Sending of file "+file.name+" begins");
-    var offset = 0;
+    offset = 0;
     var reader = new FileReader();
     /**
      * Asynchronous callback, fired when a data chunk has just been loaded by
@@ -136,7 +137,7 @@ async function restoreDataChannel() {
     // reader = new FileReader();
     console.log("Just recovered Buffer : ",recoveredBuffer," length:",recoveredBuffer.length);
     // while (senderDataChannel == null) await asyncSleep(50);
-    
+
 
 
     while ( senderDataChannel.readyState != 'open') await asyncSleep(100);
