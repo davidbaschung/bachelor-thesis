@@ -75,8 +75,8 @@ function sendFileAsync(file) {
             // }
             // reader = new FileReader();
             console.log("Just recovered Buffer : ",recoveredBuffer," length:",recoveredBuffer.length);
-            while ( ! readyForSending || (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT))
-            await asyncSleep(100);
+            while ( ! readyForSending)// || (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT))
+                await asyncSleep(100);
         }
         while (senderDataChannel == null) {
             // console.log("channel still null");
