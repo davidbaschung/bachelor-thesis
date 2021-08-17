@@ -3,7 +3,8 @@ console.log("SendFiles script loaded");
 const BYTESPERCHUNK = 16000;        /* Bytes size for loading and queuing in buffer */
 const MAXBUFFEREDAMOUNT = 16000000; /* Buffer max size, for Chrome                  */
 var filesToSendCount = 0;           /* Increment for files counting                 */
-var recoveredBuffer = [];                /* Recovery list for data in datachannel buffer */
+var recoveredBuffer = [];           /* Recovery list for data in datachannel buffer */
+var securedSize = 0;                /* The data size successfully transmitted       */
 
 /**
  * Begins sending of all files.
@@ -36,9 +37,8 @@ function sendFileAsync(file) {
         while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT && readyForSending)
             await asyncSleep(10);
         if ( ! readyForSending /*&& recoveredBuffer.length==0 && offset!=0*/) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
-            const UNBUFFEREDOFFSET = offset - senderDataChannel.bufferedAmount;
+            const RECOVERYAMOUNT = offset - securedSize;
             console.log("Buffer Recovery activated.  offset:",offset," bufferedAmount:",senderDataChannel.bufferedAmount," OFFSET_T0:",UNBUFFEREDOFFSET);
-            const RECOVERYAMOUNT = senderDataChannel.bufferedAmount;
             // function waitClosed(timeMillis) {
             //     if (reader.readyState == reader.LOADING) {
             //         asyncSleep(timeMillis).then( () => {
@@ -49,7 +49,8 @@ function sendFileAsync(file) {
             // waitClosed(50);
             // reader = null;
             var recoveryReader = new FileReader();
-            var recoveryOffset = UNBUFFEREDOFFSET; //TODO simplifier
+            console.log("T0:",offset-senderDataChannel.bufferedAmount,", securedSize:",securedSize);
+            var recoveryOffset = securedSize;
             recoveryReader.onload = (recoveryEvent) => {
                 recoveryResult = recoveryEvent.target.result;
                 // console.log("another recovery loading. offset:",offset," bufferedAmount:",senderDataChannel.bufferedAmount," OFFSET_T0:",OFFSET_T0," bytelength:",recoveryResult.byteLength);
