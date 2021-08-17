@@ -74,7 +74,8 @@ function sendFileAsync(file) {
             // }
             // reader = new FileReader();
             console.log("Just recovered Buffer : ",recoveredBuffer," length:",recoveredBuffer.length);
-            while ( ! readyForSending ) await asyncSleep(100);
+            while ( ! readyForSending || (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT))
+            await asyncSleep(100);
         }
         while (senderDataChannel == null) {
             // console.log("channel still null");
@@ -134,7 +135,7 @@ async function restoreDataChannel() {
     console.log("Restoring Data Channel");
     while ( senderDataChannel.readyState != 'open') await asyncSleep(100);
     recoveredBuffer.forEach( (e) => {
-        console.log(e);
+        // console.log(e);
         senderDataChannel.send(e);
     });
     recoveredBuffer = [];
