@@ -113,6 +113,7 @@ async function restoreDataChannel() {
     // waitClosed(50);
     // reader = null;
     var recoveryReader = new FileReader();
+    var file = filesToSend[filesToSendCount];
     // console.log("T0:",offset-senderDataChannel.bufferedAmount,", securedSize:",securedSize);
     var recoveryOffset = securedSize;
     recoveryReader.onload = async function(recoveryEvent) {
@@ -127,8 +128,8 @@ async function restoreDataChannel() {
             recoverNextSlice();
         }
     }; 
-    function recoverNextSlice() {
-        var recoverySlice = currentFile.slice(recoveryOffset, recoveryOffset + BYTESPERCHUNK);
+    function recoverNextSlice() { //TODO remove currentFile globally
+        var recoverySlice = file.slice(recoveryOffset, recoveryOffset + BYTESPERCHUNK);
         recoveryReader.readAsArrayBuffer(recoverySlice);
     };
     recoverNextSlice();
