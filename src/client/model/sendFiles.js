@@ -117,7 +117,7 @@ async function restoreDataChannel() {
     // console.log("T0:",offset-senderDataChannel.bufferedAmount,", securedSize:",securedSize);
     var recoveryOffset = securedSize;
     var i=0;
-    recoveryReader.onload = function(recoveryEvent) {
+    recoveryReader.onload = async function(recoveryEvent) {
         recoveryResult = recoveryEvent.target.result;
         console.log(i," Another recovery loading. bufferedAmount:",senderDataChannel.bufferedAmount," bytelength:",recoveryResult.byteLength);
         // recoveredBuffer.push(recoveryResult);
