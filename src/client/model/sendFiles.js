@@ -52,6 +52,9 @@ async function sendFileAsync(file) {
             currentFile = file;
             while ( ! readyForSending)// || senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT)
                 await asyncSleep(100);
+            offset = securedSize;
+            readNextSlice();
+            return;
         }
         senderDataChannel.send(result);
         offset += result.byteLength;
@@ -159,6 +162,5 @@ async function restoreDataChannel() {
     // recoveredBuffer = [];
     // // while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT && readyForSending)
     // await asyncSleep(100);
-    offset = securedSize;
     readyForSending = true;
 }
