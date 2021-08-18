@@ -58,7 +58,7 @@ socket.on("receiverJoined", function (receiverID) {
 socket.on("initDownload", function(receiverID, isRestart=false, receivedSize=0) {
 	console.log("Socket : initializing download");
 	if (isRestart) {
-		currentReceiverID = receiverID;
+		currentReceiverID = receiverID; //TODO
 		securedSize = receivedSize;
 	}
 	senderConnection = new RTCPeerConnection({
