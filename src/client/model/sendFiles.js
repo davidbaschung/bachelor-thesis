@@ -49,6 +49,7 @@ async function sendFileAsync(file) {
             await asyncSleep(10);
         if ( ! readyForSending /*&& recoveredBuffer.length==0 && offset!=0*/) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
             currentOffset = offset;
+            currentFile = file;
             while ( ! readyForSending)// || senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT)
                 await asyncSleep(100);
         }
