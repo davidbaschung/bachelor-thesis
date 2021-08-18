@@ -144,7 +144,7 @@ async function restoreDataChannel() {
     console.log("Just recovered Buffer : ",recoveredBuffer," length:",recoveredBuffer.length,", supposed length:",(RECOVERYAMOUNT)/BYTESPERCHUNK);
     // while (senderDataChannel == null) await asyncSleep(50);
     while ( senderDataChannel.readyState != 'open') await asyncSleep(100);
-    recoveredBuffer.forEach( (e) => {
+    recoveredBuffer.forEach( async (e) => {
         // console.log(e);
         while (senderDataChannel.bufferedAmount + e.byteLength > MAXBUFFEREDAMOUNT)
             await asyncSleep(50);
