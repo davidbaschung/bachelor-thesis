@@ -131,6 +131,7 @@ async function restoreDataChannel() {
     function recoverNextSlice() { //TODO remove currentFile globally
         var recoverySlice = file.slice(recoveryOffset, recoveryOffset + BYTESPERCHUNK);
         recoveryReader.readAsArrayBuffer(recoverySlice);
+        await asyncSleep(1);
     };
     recoverNextSlice();
     await asyncSleep(100);
@@ -140,11 +141,13 @@ async function restoreDataChannel() {
     //     recoveryReader.readAsArrayBuffer(recSlice);
     // }
     // reader = new FileReader();
-    console.log("Just recovered Buffer : ",recoveredBuffer," length:",recoveredBuffer.length);
+    console.log("Just recovered Buffer : ",recoveredBuffer," length:",recoveredBuffer.length,", supposed length:",(RECOVERYAMOUNT)/BYTESPERCHUNK);
     // while (senderDataChannel == null) await asyncSleep(50);
     while ( senderDataChannel.readyState != 'open') await asyncSleep(100);
     recoveredBuffer.forEach( (e) => {
         // console.log(e);
+        while (senderDataChannel.bufferedAmount + e.byteLength > MAXBUFFEREDAMOUNT)
+            await asyncSleep(50);
         senderDataChannel.send(e);
     });
     recoveredBuffer = [];
