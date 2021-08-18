@@ -115,7 +115,7 @@ async function restoreDataChannel() {
     var recoveryReader = new FileReader();
     var file = filesToSend[filesToSendCount];
     // console.log("T0:",offset-senderDataChannel.bufferedAmount,", securedSize:",securedSize);
-    var recoveryOffset = securedSize;
+    var recoveryOffset = securedSize + 1;
     var i=0;
     recoveryReader.onload = async function(recoveryEvent) {
         recoveryResult = recoveryEvent.target.result;

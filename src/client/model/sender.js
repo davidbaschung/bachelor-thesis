@@ -235,7 +235,7 @@ function iceConnectionStateChange_A(event) {
 	checkConnectivity(0);
 }
 /* Host first reconnection after a network failure */
-socket.on("hostReconnected", () => console.log("Host Reconnected"));
+socket.on("hostReconnected", () => console.log("Reconnected as host"));
 /* Socket aliveness testing */
 socket.on("ping", function (id) {
 	console.log("ping");
