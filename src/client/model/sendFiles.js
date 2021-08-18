@@ -128,7 +128,7 @@ async function restoreDataChannel() {
             recoverNextSlice();
         }
     }; 
-    function recoverNextSlice() { //TODO remove currentFile globally
+    async function recoverNextSlice() { //TODO remove currentFile globally
         var recoverySlice = file.slice(recoveryOffset, recoveryOffset + BYTESPERCHUNK);
         recoveryReader.readAsArrayBuffer(recoverySlice);
         await asyncSleep(1);
