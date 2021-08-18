@@ -132,6 +132,7 @@ async function restoreDataChannel() {
         recoveryReader.readAsArrayBuffer(recoverySlice);
     };
     recoverNextSlice();
+    await asyncSleep(100);
     // for (var i=0; i<SLICESCOUNT; i++) {
     //     var chunkLocation = OFFSET_T0 + i * BYTESPERCHUNK;
     //     var recSlice = file.slice(chunkLocation, chunkLocation+BYTESPERCHUNK);
