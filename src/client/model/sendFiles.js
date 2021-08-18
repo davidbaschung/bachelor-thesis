@@ -121,7 +121,7 @@ async function restoreDataChannel() {
         recoveryResult = recoveryEvent.target.result;
         console.log(i," Another recovery loading. bufferedAmount:",senderDataChannel.bufferedAmount," bytelength:",recoveryResult.byteLength);
         recoveredBuffer.push(recoveryResult);
-        if (i%50==0) console.log(recoverdBuffer);
+        if (i%50==0) console.log(recoveredBuffer);
         recoveryOffset += recoveryResult.byteLength;
         // if (recoveredAmount<100000)
         var recoveredAmount = recoveryOffset-securedSize;
