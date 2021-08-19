@@ -37,7 +37,7 @@ function copyToClipboard(str) {
  * @param {Number} timeMillis - waiting time in milliseconds
  * @returns A promise that the caller must "await"
  */
- async function asyncSleep(timeMillis) {
+async function asyncSleep(timeMillis) {
     return new Promise((resolve => setTimeout(resolve,timeMillis)));
 }
 
