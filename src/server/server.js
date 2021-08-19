@@ -197,6 +197,6 @@ async function cleanUnusedRooms() {
         // io.sockets.to(transferMetaDataMap.roomHostSocket).emit("ping", key);
     }
     console.log("Server cleaning : ",transferMetaDataMap.size," active rooms. Deleted ",deleted," unused rooms.");
-    await new Promise((resolve => setTimeout(resolve,1000))).catch((error) => console.log(error));
+    try { await new Promise((resolve => setTimeout(resolve,1000))); } catch (error) { console.log(error) };
     cleanUnusedRooms();
 }
