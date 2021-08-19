@@ -163,7 +163,7 @@ io.on("connection", function (socket) {
 
     /* Used for socket aliveness verification to remove dead connections */
     socket.on("pong", function (receiverCode) {
-        console.log("pong from ",socket.id);
+        console.log("pong from ",socket.id," with code ",receiverCode);
         transferMetaDataMap.get(receiverCode).hostResponded = true;
     });
 });
@@ -177,26 +177,25 @@ async function cleanUnusedRooms() {
     // size_t0 = transferMetaDataMap.size;
     var deleted = 0;
     for (var [key,value] of transferMetaDataMap.entries()) {
-        if ( ! value.roomHostSocket.connected)
-            value.noResponseCount++;
-            if (value.noResponseCount>=5) {
-                transferMetaDataMap.delete(key);
-                deleted++;
-            }
-        else {
-            value.noResponseCount=0;
+        // if ( ! value.roomHostSocket.connected)
+        //     value.noResponseCount++;
+        //     if (value.noResponseCount>=5) {
+        //         transferMetaDataMap.delete(key);
+        //         deleted++;
+        //     }
+        // else {
+        //     value.noResponseCount=0;
+        // }
+        if (value.hostResponded) {
+            console.log(socket.id," responded positively");
+            value.noResponseCount = 0;
+            value.hostResponded = false;
+        } else {
+            ++value.noResponseCount;
+            if (value.noResponseCount >= 10) transferMetaDataMap.delete(key); /* Deletion is dangerous as sockets cannot be reliably addressed. */
         }
+        io.sockets.to(transferMetaDataMap.roomHostSocket).emit("ping", key);
     }
-    //     // io.sockets.to(transferMetaDataMap.roomHostSocket).emit("ping", key);
-    //     if (value.hostResponded) {
-    //         console.log(socket.id," responded positively");
-    //         value.noResponseCount = 0;
-    //         value.hostResponded = false;
-    //     } else {
-    //         ++value.noResponseCount;
-    //         if (value.noResponseCount >= 10) transferMetaDataMap.delete(key); /* Deletion is dangerous as sockets cannot be reliably addressed. */
-    //     }
-    // }
     console.log("Server cleaning : ",transferMetaDataMap.size," active rooms. Deleted ",deleted," unused rooms.");
     await new Promise(resolve => setTimeout(resolve,1000));
     cleanUnusedRooms();
