@@ -29,8 +29,12 @@ function launchClientSender() {
 	});
 	readyForSending = true;
 }
-socket.on('newRoomCreated', function() {
+socket.on('newRoomCreated', async function() {
 	console.log("Socket : new room created on the server");
+	while(true) {
+		socket.emit("pong", getCodeLabel(true));
+		await asyncSleep(1000);
+	}
 });
 
 /**

@@ -192,9 +192,9 @@ async function cleanUnusedRooms() {
             value.hostResponded = false;
         } else {
             ++value.noResponseCount;
-            if (value.noResponseCount >= 10) transferMetaDataMap.delete(key); /* Deletion is dangerous as sockets cannot be reliably addressed. */
+            if (value.noResponseCount >= 5) transferMetaDataMap.delete(key); /* Deletion is dangerous as sockets cannot be reliably addressed. */
         }
-        io.sockets.to(transferMetaDataMap.roomHostSocket).emit("ping", key);
+        // io.sockets.to(transferMetaDataMap.roomHostSocket).emit("ping", key);
     }
     console.log("Server cleaning : ",transferMetaDataMap.size," active rooms. Deleted ",deleted," unused rooms.");
     await new Promise(resolve => setTimeout(resolve,1000));
