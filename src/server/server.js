@@ -37,7 +37,7 @@ var server = APP.listen(port, function () { /* The server listens to the port   
 });
 var io = SOCKETS(server);                   /* Incoming connections are managed by the socket server*/
 var transferMetaDataMap = new Map();        /* The rooms map each receiver code to files metadata   */
-// cleanUnusedRooms();                      /* Experimental only with socket.io                     */
+cleanUnusedRooms();                        //* Experimental only with socket.io                     */
 
 /** 
  * Triggered when a clients connects itself to the server.
@@ -176,17 +176,25 @@ io.on("connection", function (socket) {
 async function cleanUnusedRooms() {
     size_t0 = transferMetaDataMap.size;
     for (var [key,value] of transferMetaDataMap.entries()) {
-        io.sockets.to(transferMetaDataMap.roomHostSocket).emit("ping", key);
-        if (value.hostResponded) {
-            console.log(socket.id," responded positively");
-            value.noResponseCount = 0;
-            value.hostResponded = false;
-        } else {
-            ++value.noResponseCount;
-            if (value.noResponseCount >= 10) transferMetaDataMap.delete(key); /* Deletion is dangerous as sockets cannot be reliably addressed. */
+        if ( ! value.roomHostSocket.connected)
+            value.noResponseCount++;
+            if (value.noResponseCount>=5)
+                transferMetaDataMap.delete(key);
+        else {
+            value.noResponseCount=0;
         }
     }
+    //     // io.sockets.to(transferMetaDataMap.roomHostSocket).emit("ping", key);
+    //     if (value.hostResponded) {
+    //         console.log(socket.id," responded positively");
+    //         value.noResponseCount = 0;
+    //         value.hostResponded = false;
+    //     } else {
+    //         ++value.noResponseCount;
+    //         if (value.noResponseCount >= 10) transferMetaDataMap.delete(key); /* Deletion is dangerous as sockets cannot be reliably addressed. */
+    //     }
+    // }
     console.log("Server cleaning : deleted ",size_t0-transferMetaDataMap.size," unused rooms.");
-    await new Promise(resolve => setTimeout(resolve,60000));
+    await new Promise(resolve => setTimeout(resolve,1000));
     cleanUnusedRooms();
 }
