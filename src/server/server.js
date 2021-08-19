@@ -72,6 +72,7 @@ io.on("connection", function (socket) {
      */
     socket.on('joinRoom', function(inputedCode) {
         var transferMetaData = transferMetaDataMap.get(inputedCode);
+        if (transferMetaData == undefined) return;
         var accepted = false;
         if (transferMetaData != undefined) accepted = true;
         console.log((accepted?"Correct":"Wrong")+" code ("+inputedCode+") received by socket "+socket.id+", request "+(accepted?"accepted":"refused")+".");
@@ -144,6 +145,7 @@ io.on("connection", function (socket) {
     socket.on("restoreConnection", function (receiverCode, isHost) {
         console.log("Restoring connection with code : ",receiverCode," , isHost : ",isHost);
         var transferMetaData = transferMetaDataMap.get(receiverCode);
+        if (transferMetaData == undefined) return;
         console.log("-> Some metadata :  host : ",transferMetaData.roomHostSocket.id,", hostReconnected : ", transferMetaData.hostReconnected);
         if (isHost) {
             transferMetaData.roomHostSocket = socket;
@@ -164,7 +166,9 @@ io.on("connection", function (socket) {
     /* Used for socket aliveness verification to remove dead connections */
     socket.on("pong", function (receiverCode) {
         console.log("pong from ",socket.id," with code ",receiverCode);
-        transferMetaDataMap.get(receiverCode).hostResponded = true;
+        var transferMetaData = transferMetaDataMap.get(receiverCode);
+        if (transferMetaData == undefined) return;
+        transferMetaData.hostResponded = true;
     });
 });
 
