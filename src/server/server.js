@@ -174,12 +174,15 @@ io.on("connection", function (socket) {
  * Cleans the phantom rooms that haven't been used 10 minutes after the last connection.
  */
 async function cleanUnusedRooms() {
-    size_t0 = transferMetaDataMap.size;
+    // size_t0 = transferMetaDataMap.size;
+    var deleted = 0;
     for (var [key,value] of transferMetaDataMap.entries()) {
         if ( ! value.roomHostSocket.connected)
             value.noResponseCount++;
-            if (value.noResponseCount>=5)
+            if (value.noResponseCount>=5) {
                 transferMetaDataMap.delete(key);
+                deleted++;
+            }
         else {
             value.noResponseCount=0;
         }
@@ -194,7 +197,7 @@ async function cleanUnusedRooms() {
     //         if (value.noResponseCount >= 10) transferMetaDataMap.delete(key); /* Deletion is dangerous as sockets cannot be reliably addressed. */
     //     }
     // }
-    console.log("Server cleaning : deleted ",size_t0-transferMetaDataMap.size," unused rooms.");
+    console.log("Server cleaning : ",transferMetaDataMap.size," active rooms. Deleted ",deleted," unused rooms.");
     await new Promise(resolve => setTimeout(resolve,1000));
     cleanUnusedRooms();
 }
