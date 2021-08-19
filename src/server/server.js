@@ -187,7 +187,7 @@ async function cleanUnusedRooms() {
         //     value.noResponseCount=0;
         // }
         if (value.hostResponded) {
-            console.log(socket.id," responded positively");
+            // console.log(socket.id," responded positively");
             value.noResponseCount = 0;
             value.hostResponded = false;
         } else {

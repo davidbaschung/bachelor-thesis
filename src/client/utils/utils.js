@@ -38,7 +38,7 @@ function copyToClipboard(str) {
  * @returns A promise that the caller must "await"
  */
 async function asyncSleep(timeMillis) {
-    return new Promise((resolve => setTimeout(resolve,timeMillis)));
+    try { await new Promise((resolve => setTimeout(resolve,timeMillis))); } catch (error) { console.log(error) };
 }
 
 /**
