@@ -29,11 +29,12 @@
         <footer>
             <div center>
                 <a class="footerLink" href="https://github.com/davidbaschung/travail-de-bachelor">Github (source code)</a>
-                <a class="footerLink" href="P2P Secure File Transfer-1.0.0 Setup.exe" download>Desktop-app</a>
+                <a class="footerLink" href="P2P Secure File Transfer-1.0.0 Setup.exe" download onclick="displayInstallInstructions()">Desktop-app</a>
                 <a class="footerLink" href="Secure P2P Data Transfer using WebRTC.pdf" download>Thesis</a>
                 <a class="footerLink" href="mailto:davidbaschung1@gmail.com">✉️ David Baschung</label>
             </div>
         </footer>
+        <div id="installInstructions" style="display:none"></div>
         <script src="utils/utils.js"></script>
         <script src="view/page.js"></script>
         <script src="model/client.js"></script>

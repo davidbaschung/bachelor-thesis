@@ -78,7 +78,7 @@ div.titleZone{
   font-weight:bold;
 }
 
-div.innerZone {
+div.innerZone, #installInstructions {
   padding-left:10px;
   padding-right:10px;
   margin:15px;
@@ -223,4 +223,13 @@ a.footerLink:hover {
 }
 a.footerLink:active {
   color:white;
+}
+
+#installInstructions {
+  border-radius:15px;
+  padding:15px;
+  text-align:left;
+  white-space: pre-wrap;
+  color:var(--backgroundColor);
+  background-color:var(--linkHighlight);
 }

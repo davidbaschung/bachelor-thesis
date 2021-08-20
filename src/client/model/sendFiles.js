@@ -1,13 +1,8 @@
 console.log("SendFiles script loaded");
-//TODO
 const BYTESPERCHUNK = 16000;        /* Bytes size for loading and queuing in buffer     */
 const MAXBUFFEREDAMOUNT = 16000000; /* Buffer max size, for Chrome                      */
 var filesToSendCount = 0;           /* Increment for files counting                     */
-                                    /* For recovery case :                              */
-var currentFile = null;             /*   Currently sended file, for eventual recovery   */
-var recoveredBuffer = [];           /*   Recovery list for data in datachannel buffer   */
 var securedSize = 0;                /*   The data size successfully transmitted         */
-var currentOffset = 0;              /*   Current offset, for eventual recovery          */
 
 /**
  * Begins sending of all files.
@@ -34,23 +29,11 @@ async function sendFileAsync(file) {
      * @param {ProgressEvent} event - Contains the loaded targeted data
      */
     reader.onload = async function(event) {
-        // console.log("New load. offset : ",offset);
         var result = event.target.result;
-        // await asyncSleep(50); // TODO keep?
-        while (senderDataChannel == null) {
-            // console.log("channel still null");
-            await asyncSleep(50);
-        }
-        while (senderDataChannel.readyState != 'open') {
-            // console.log("channel still not open");
-            await asyncSleep(50);
-        }
         while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT && readyForSending)
             await asyncSleep(10);
-        if ( ! readyForSending /*&& recoveredBuffer.length==0 && offset!=0*/) { /* When the loading stream is interrupted by connection loss (through kill-switch) */
-            currentOffset = offset;
-            currentFile = file;
-            while ( ! readyForSending)// || senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT)
+        if ( ! readyForSending) {   /* When the loading stream is interrupted by connection loss (through kill-switch) */
+            while ( ! readyForSending)
                 await asyncSleep(100);
             offset = securedSize;
             readNextSlice();
@@ -61,7 +44,6 @@ async function sendFileAsync(file) {
         if (offset < file.size) {
             readNextSlice();
         } else {
-            console.log("Offset : ", offset, " , File size : ", file.size);
             sendFilesAsyncCallback(file);
         }
     };
@@ -77,7 +59,6 @@ async function sendFileAsync(file) {
         reader.readAsArrayBuffer(slice);
     }
     readNextSlice(); /* loading initialization */
-    console.log("Sending of file "+file.name+" finished");
 }
 
 /**
@@ -103,64 +84,5 @@ function resetFilesSending() {
 
 /* Restores the recovered data from the DataChannel buffer */
 async function restoreDataChannel() {
-    // console.log("Restoring Data Channel");
-    // const RECOVERYAMOUNT = currentOffset - securedSize;
-    // console.log("Buffer Recovery activated. securedSize:",securedSize," currentOffset:",currentOffset);
-    // // function waitClosed(timeMillis) {
-    // //     if (reader.readyState == reader.LOADING) {
-    // //         asyncSleep(timeMillis).then( () => {
-    // //             waitClosed(timeMillis);
-    // //         });
-    // //     }
-    // // }
-    // // waitClosed(50);
-    // // reader = null;
-    // var recoveryReader = new FileReader();
-    // var file = filesToSend[filesToSendCount];
-    // // console.log("T0:",offset-senderDataChannel.bufferedAmount,", securedSize:",securedSize);
-    // var recoveryOffset = securedSize;
-    // var i=0;
-    // recoveryReader.onload = async function(recoveryEvent) {
-    //     recoveryResult = recoveryEvent.target.result;
-    //     console.log(i," Another recovery loading. bufferedAmount:",senderDataChannel.bufferedAmount," bytelength:",recoveryResult.byteLength);
-    //     // recoveredBuffer.push(recoveryResult);
-    //     while (senderDataChannel.bufferedAmount + recoveryResult.byteLength > MAXBUFFEREDAMOUNT)
-    //         await asyncSleep(50);
-    //     senderDataChannel.send(recoveryResult);
-    //     if (i%50==0) console.log(recoveredBuffer);
-    //     recoveryOffset += recoveryResult.byteLength;
-    //     // if (recoveredAmount<100000)
-    //     var recoveredAmount = recoveryOffset-securedSize;
-    //     i++;
-    //     if (recoveredAmount < RECOVERYAMOUNT) { // TODO bon nombre push?
-    //         // console.log("recoveredAmount:",recoveredAmount," on ",RECOVERYAMOUNT,". Loading next slice");
-    //         recoverNextSlice();
-    //     }
-    // }; 
-    // function recoverNextSlice() { //TODO remove currentFile globally
-    //     var recoverySlice = file.slice(recoveryOffset, recoveryOffset + BYTESPERCHUNK);
-    //     recoveryReader.readAsArrayBuffer(recoverySlice);
-    //     // await asyncSleep(1);
-    // };
-    // recoverNextSlice();
-    // await asyncSleep(100);
-    // // for (var i=0; i<SLICESCOUNT; i++) {
-    // //     var chunkLocation = OFFSET_T0 + i * BYTESPERCHUNK;
-    // //     var recSlice = file.slice(chunkLocation, chunkLocation+BYTESPERCHUNK);
-    // //     recoveryReader.readAsArrayBuffer(recSlice);
-    // // }
-    // // reader = new FileReader();
-    // console.log("Just recovered Buffer : ",recoveredBuffer," length:",recoveredBuffer.length,", supposed length:",(RECOVERYAMOUNT)/BYTESPERCHUNK);
-    // // while (senderDataChannel == null) await asyncSleep(50);
-    // while ( senderDataChannel.readyState != 'open') await asyncSleep(100);
-    // recoveredBuffer.forEach( async (e) => {
-    //     // // console.log(e);
-    //     // while (senderDataChannel.bufferedAmount + e.byteLength > MAXBUFFEREDAMOUNT)
-    //     //     await asyncSleep(50);
-    //     // senderDataChannel.send(e);
-    // });
-    // recoveredBuffer = [];
-    // // while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT && readyForSending)
-    // await asyncSleep(100);
     readyForSending = true;
 }

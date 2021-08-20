@@ -7,7 +7,7 @@ var receiverDataChannel;/* Receiver P2P DataChannel 			*/
 
 /**
  * Sends the inputed receiver-code to the server to get files metadata.
- * @param {String} inputedCode 
+ * @param {String} inputedCode - Receiver code inputed
  */
 function requireFilesMetada(inputedCode) {
 	socket.emit("joinRoom", inputedCode);
@@ -16,7 +16,7 @@ function requireFilesMetada(inputedCode) {
 /**
  * Sends a download initialization request to the sender. (through server)
  * Provides the previously inputed receiver-code again.
- * @param {String} inputedCode - receiver code inputed
+ * @param {String} inputedCode - Receiver code inputed
  */
 function download(inputedCode) {
 	console.log("Request download initialization");
@@ -139,7 +139,7 @@ socket.on("IceCandidateA", function (IceCandidateA) {
 /**
  * Called by the local RTCPeerConnection on candidate creation.
  * This sends the created ICE candidate to the sender.
- * @param {RTCPeerConnectionIceEvent} event - Networking ICE event, contains an RTCIceCandidate
+ * @param {RTCPeerConnectionIceEvent} event - Networking ICE event, contains an RTCIceCandidate from the sender
  */
 function onIceCandidateRTC_B(event) {
 	console.log("RTC : IceCandidateB created, it will be sent");
@@ -152,7 +152,7 @@ function onIceCandidateRTC_B(event) {
 /**
  * Sets up the DataChannel offered by the sender. It's Exclusive to the receiver.
  * Attributes appropriate functions to react to DataChannel events.
- * @param {RTCDataChannelEvent} event 
+ * @param {RTCDataChannelEvent} event - Networking ICE event, contains the DataChannel from the sender
  */
 function receiveDataChannelRTC(event) {
 	console.log("RTC : receiverDataChannel received");
@@ -187,27 +187,22 @@ function closeReceivingDC() {
 }
 
 /**
- * Experimental only with socket.io.
- * 
  * Re-establishes the socket connection based on the room existence.
  * Waits for the sender to rejoin first, then rejoins and restarts the download.
- * @param {Event} event - peer-to-peer connection state
+ * @param {Event} event - Peer-to-peer connection state
  */
 function iceConnectionStateChange_B(event) {
-	const MAXCOUNT = 600;
+	const MAXSECONDSFORLOSTCONNECTION = 900;
 	function checkConnectivity(count) {
 		if (receiverConnection==null || receiverConnection==undefined) 
 			return;
 		console.log("RTC : ICE state : ",event.target.connectionState);
 		var state = receiverConnection.iceConnectionState;
 		if ( ! ( state == "connected" ) ) {
-			if (count < MAXCOUNT) {
+			if (count < MAXSECONDSFORLOSTCONNECTION) {
 				asyncSleep(3000).then(() => {
 					if (count>=10 && count%5==0) {
-						// socket.close();
-						// socket = io.connect(url);
 						socket.emit("restoreConnection", getInput(true), false);
-						// console.log("New socket created");
 						console.log("Socket state : "+socket.connected);
 					}
 					checkConnectivity(++count);

@@ -11,7 +11,7 @@ function $(element) {
 /**
  * Returns an HTML element relatively to another one
  * @param {String} xpath - Xpath expression targeting the path to a second element
- * @param {HTMLElement} context - The base element used to target the second one.
+ * @param {HTMLElement} context - The base element used to target the second one
  * @returns The single second HTML element
  */
 function xpath(xpath, context) {
@@ -34,7 +34,7 @@ function copyToClipboard(str) {
 
 /**
  * Asynchronous way to pause the execution
- * @param {Number} timeMillis - waiting time in milliseconds
+ * @param {Number} timeMillis - Waiting time in milliseconds
  * @returns A promise that the caller must "await"
  */
 async function asyncSleep(timeMillis) {
@@ -45,8 +45,8 @@ async function asyncSleep(timeMillis) {
  * Converts a certificate fingerprint to a code / passphrase of 4 words.
  * This requests the dictionary, then applies modulos to the fingerprint as many times
  * as there should be words to construct the code.
- * @param {String} hash - the hexadecimal fingerprint hash
- * @returns 
+ * @param {String} hash - The hexadecimal fingerprint hash
+ * @returns The code substituted to the hash
  */
 function hashToPassphrase(hash) {
     console.log("Hash : source fingerprint : ", hash);

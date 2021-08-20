@@ -62,7 +62,7 @@ socket.on("receiverJoined", function (receiverID) {
 socket.on("initDownload", function(receiverID, isRestart=false, receivedSize=0) {
 	console.log("Socket : initializing download");
 	if (isRestart) {
-		currentReceiverID = receiverID; //TODO
+		currentReceiverID = receiverID;
 		securedSize = receivedSize;
 	}
 	senderConnection = new RTCPeerConnection({
@@ -159,7 +159,6 @@ function openSendingDC() {
 	setResetButtonLabel("cancel");
 	setFeedback(false, "","");
 	readyForSending ? sendFilesAsync() : restoreDataChannel();
-	// sendFileAsync();
 }
 
 /* Closes files sending. Called by the DataChannel on closing. */
@@ -184,19 +183,16 @@ socket.on("transferStatus", function (newStatus) {
 });
 
 /**
- * Experimental only with socket.io.
- * 
  * Manages changing connection states. Re-establishes the socket and P2P connection when lost.
- * @param {Event} event - state change event, with connectivity informations.
+ * @param {Event} event - state change event, with connectivity informations
  */
 function iceConnectionStateChange_A(event) {
 	const MAXSECONDSFORLOSTCONNECTION = 900;
 	/**
 	 * Checks the P2P connection repetitively.
 	 * Actively tries to reconnect for 10 minutes, if the state isn't "connected".
-	 * Reconnectiong uses a readyForSending flag to authorize/pause sending on dataChannels, then recreates connections.
-	 * @param {Number} count 
-	 * @returns 
+	 * Reconnection uses a readyForSending flag to authorize/pause sending on dataChannels, then recreates connections.
+	 * @param {Number} count - seconds since the connection was lost
 	 */
 	function checkConnectivity(count) {	
 		if (senderConnection==null || senderConnection==undefined)
@@ -210,20 +206,6 @@ function iceConnectionStateChange_A(event) {
 						console.log("RTC+Socket : connection lost, reconnecting");
 						readyForSending = false;
 						senderDataChannel.close();
-						// while (senderDataChannel != null) //.readyState != WebSocket.CLOSED)
-
-						// function waitClosed(timeMillis) {
-						// 	if (senderDataChannel != null) {
-						// 		asyncSleep(timeMillis).then( () => {
-						// 			waitClosed(timeMillis);
-						// 		});
-						// 	}
-						// }
-						// waitClosed(5);
-
-						// socket = io.connect(url, {"force new connection":true});
-						// console.log("Socket : new socket created : ",socket.id);
-
 						console.log("Socket state : "+socket.connected);
 						socket.emit("restoreConnection", getCodeLabel(true), true);
 						return;
@@ -232,7 +214,7 @@ function iceConnectionStateChange_A(event) {
 				});
 			} else {
 				senderDataChannel.close();
-				setFeedback(false,"The connection failed, download canceled.",colors.RED);
+				setFeedback(false,"The connection failed, download cancelled.",colors.RED);
 			}
 		}
 	}
@@ -240,8 +222,3 @@ function iceConnectionStateChange_A(event) {
 }
 /* Host first reconnection after a network failure */
 socket.on("hostReconnected", () => console.log("Reconnected as host"));
-/* Socket aliveness testing */
-socket.on("ping", function (id) {
-	console.log("ping");
-	socket.emit("pong", id);
-});

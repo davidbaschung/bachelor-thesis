@@ -12,13 +12,13 @@ const APP = EXPRESS();
 class TransferMetaData {
     constructor(roomHostSocket, files) {
         this.roomHostSocket = roomHostSocket;
-        this.hostReconnected = false;   /* flag activated by host in case of P2P connection failure */
+        this.hostReconnected = false;   /* flag activated by room host in case of P2P connection failure */
         this.files = files;
         this.size = 0;
         for (var f of files) {
             this.size += f.size;
         }
-        this.hostResponded = false;      /* flag activated by host to check socket availability      */
+        this.hostResponded = false;     /* flag activated by room host to check socket availability      */
         this.noResponseCount = 0;
     }
 }
@@ -28,16 +28,16 @@ APP.get("/", function (request, response) {
     response.redirect("https://"+url.substring(7,url.length));
 })
 
-var port = process.env.PORT;                /* HEROKU.com listening port                            */
-if (port == null || port == "") {           /* Local port otherwise                                 */
+var port = process.env.PORT;                /* HEROKU.com listening port                                */
+if (port == null || port == "") {           /* Local port otherwise                                     */
     port = 4001;
 }
-var server = APP.listen(port, function () { /* The server listens to the port                       */
+var server = APP.listen(port, function () { /* The server listens to the port                           */
     console.log("Server started");
 });
-var io = SOCKETS(server);                   /* Incoming connections are managed by the socket server*/
-var transferMetaDataMap = new Map();        /* The rooms map each receiver code to files metadata   */
-cleanUnusedRooms();                        //* Experimental only with socket.io                     */
+var io = SOCKETS(server);                   /* Incoming connections are managed by the socket server    */
+var transferMetaDataMap = new Map();        /* The rooms map each receiver code to files metadata       */
+cleanUnusedRooms();                         /* Clean ghost metadata from unused or lost connections     */
 
 /** 
  * Triggered when a clients connects itself to the server.
@@ -68,7 +68,7 @@ io.on("connection", function (socket) {
     /**
      * The receiver joins a room by providing its receiver code.
      * The appropriate room is retrieved from the dictionary with the code.
-     * If the code is right, the files metadats are sent back. Otherwise, a refusal message.
+     * If the code is right, the files metadata are sent back. Otherwise, a refusal message.
      */
     socket.on('joinRoom', function(inputedCode) {
         var transferMetaData = transferMetaDataMap.get(inputedCode);
@@ -149,9 +149,7 @@ io.on("connection", function (socket) {
         console.log("-> Some metadata :  host : ",transferMetaData.roomHostSocket.id,", hostReconnected : ", transferMetaData.hostReconnected);
         if (isHost) {
             transferMetaData.roomHostSocket = socket;
-            // console.log("host socket before : ",transferMetaData.roomHostSocket.id," ,   host socket after : ",socket.id);
             transferMetaData.hostReconnected = true;
-            // console.log("var-transferMetadata connected : ", transferMetaData.hostReconnected," ,    Map connected : ", transferMetaDataMap.get(receiverCode).hostReconnected);
             socket.emit("hostReconnected");
         } else {
             console.log("Is not host. Socket : ", socket.id);
@@ -165,36 +163,20 @@ io.on("connection", function (socket) {
 
     /* Used for socket aliveness verification to remove dead connections */
     socket.on("pong", function (receiverCode) {
-        console.log("pong from ",socket.id," with code ",receiverCode);
+        // console.log("pong from ",socket.id," with code ",receiverCode);
         var transferMetaData = transferMetaDataMap.get(receiverCode);
         if (transferMetaData == undefined) return;
         transferMetaData.hostResponded = true;
     });
 });
 
-/**
- * Experimental only with socket.io
- * 
- * Cleans the phantom rooms that haven't been used 10 minutes after the last connection.
- */
+/* Cleans the ghost rooms from host connections that haven't been used for 15 minutes. */
 async function cleanUnusedRooms() {
     const SECONDSPERTEST = 60;
     const SECONDSBEFORELOSINGCONNECTION = 900;
-    
-    // size_t0 = transferMetaDataMap.size;
     var deleted = 0;
     for (var [key,value] of transferMetaDataMap.entries()) {
-        // if ( ! value.roomHostSocket.connected)
-        //     value.noResponseCount++;
-        //     if (value.noResponseCount>=5) {
-        //         transferMetaDataMap.delete(key);
-        //         deleted++;
-        //     }
-        // else {
-        //     value.noResponseCount=0;
-        // }
         if (value.hostResponded) {
-            // console.log(socket.id," responded positively");
             value.noResponseCount = 0;
             value.hostResponded = false;
         } else {
@@ -204,7 +186,6 @@ async function cleanUnusedRooms() {
                 ++deleted;
             }
         }
-        // io.sockets.to(transferMetaDataMap.roomHostSocket).emit("ping", key);
     }
     console.log("Server cleaning : ",transferMetaDataMap.size," active rooms. Deleted ",deleted," unused rooms.");
     try { await new Promise((resolve => setTimeout(resolve,SECONDSPERTEST*1000))); } catch (error) { console.log(error) };

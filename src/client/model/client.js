@@ -2,7 +2,7 @@ console.log("Client script loaded");
 
 var url = window.location.href;					/* the URL to contact the signaling server 				*/
 if (/Electron/i.test(navigator.userAgent)) {	/* for the Desktop-app, the URL must be indicated 		*/
-	url = "https://travail-de-bachelor.herokuapp.com";
+	url = "https://www.p2psecurefiletransfer.com";
 } else if ( ! /Chrome|CriOS|Edge|Edg|EdgiOS/.test(navigator.userAgent)) {
 	alert("You need to use Google Chrome or Microsoft Edge to use this application");
 } else {

@@ -333,10 +333,22 @@ function setCodeLabel(code, isReceiverCode) {
 
 /**
  * Returns the sender or receiver code from the page label
- * @param {Boolean} isReceiverCode - true for receiver-code on sender's page label
+ * @param {Boolean} isReceiverCode - 'true' for receiver-code on sender's page label
  * @returns - The code as a string
  */
 function getCodeLabel(isReceiverCode) {
     var ID = isReceiverCode ? "receiverCode" : "senderCode";
     return $(ID).innerHTML;
+}
+
+function displayInstallInstructions() {
+    var zone = $("installInstructions");
+    zone.style = "display:block";
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200)       
+            zone.innerHTML = this.responseText;
+    };
+    request.open("GET", "Readme.txt", false);
+    request.send();
 }
