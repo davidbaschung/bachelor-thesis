@@ -232,7 +232,7 @@ function iceConnectionStateChange_A(event) {
 				});
 			} else {
 				senderDataChannel.close();
-				setFeedback(false,"The connection failed, download cancelled.",colors.RED);
+				setFeedback(false,"The connection failed, download canceled.",colors.RED);
 			}
 		}
 	}
