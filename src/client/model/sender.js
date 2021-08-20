@@ -190,7 +190,7 @@ socket.on("transferStatus", function (newStatus) {
  * @param {Event} event - state change event, with connectivity informations.
  */
 function iceConnectionStateChange_A(event) {
-	const MAXCOUNT = 600;
+	const MAXSECONDSFORLOSTCONNECTION = 900;
 	/**
 	 * Checks the P2P connection repetitively.
 	 * Actively tries to reconnect for 10 minutes, if the state isn't "connected".
@@ -204,7 +204,7 @@ function iceConnectionStateChange_A(event) {
 		console.log("RTC : ICE state : ",event.target.connectionState);
 		var state = senderConnection.iceConnectionState;
 		if ( ! ( state == "connected" ) ) {
-			if (count < MAXCOUNT) {
+			if (count < MAXSECONDSFORLOSTCONNECTION) {
 				asyncSleep(1000).then(() => {
 					if (count>0 && count%10==0) {
 						console.log("RTC+Socket : connection lost, reconnecting");
