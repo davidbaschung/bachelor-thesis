@@ -69,7 +69,7 @@ function receiveChunks(loadOfChunks) {
         receivedSize = nextFileChunks.byteLength;
         if (filesToReceiveCount == filesToReceive.length) {
             console.log("All files have been downloaded");
-            if (updateTransferStatus(true, newStatus+"% downloaded\nTry our desktop App!\n↓", true))
+            if (updateTransferStatus(true, newStatus+"% downloaded<br/>Try our desktop App!<br/>↓", true))
                 socket.emit("transferStatus", newStatus, currentSenderID);
             resetFilesReceiving();
             receiverDataChannel.close();
