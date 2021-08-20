@@ -30,6 +30,10 @@ async function sendFileAsync(file) {
      */
     reader.onload = async function(event) {
         var result = event.target.result;
+        while (senderDataChannel == null)
+            await asyncSleep(50);
+        while (senderDataChannel.readyState != 'open')
+            await asyncSleep(50);
         while (senderDataChannel.bufferedAmount + result.byteLength > MAXBUFFEREDAMOUNT && readyForSending)
             await asyncSleep(1);
         if ( ! readyForSending) {   /* When the loading stream is interrupted by connection loss (through kill-switch) */
