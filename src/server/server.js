@@ -196,7 +196,8 @@ async function cleanUnusedRooms() {
             value.hostResponded = false;
         } else {
             ++value.noResponseCount;
-            if (value.noResponseCount >= 5) transferMetaDataMap.delete(key); /* Deletion is dangerous as sockets cannot be reliably addressed. */
+            if (value.noResponseCount >= 5) transferMetaDataMap.delete(key);
+            ++deleted;
         }
         // io.sockets.to(transferMetaDataMap.roomHostSocket).emit("ping", key);
     }
