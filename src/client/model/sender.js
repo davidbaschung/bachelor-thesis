@@ -178,8 +178,10 @@ function closeSendingDC() {
  */
 socket.on("transferStatus", function (newStatus) {
 	updateTransferStatus(false, newStatus+"% uploaded", true);
-	if (newStatus.includes("100"))
+	if (newStatus.includes("100")) {
 		setResetButtonLabel("reset");
+		updateTransferStatus(false, newStatus+"% uploaded\nTry our desktop App!\n↓", true);
+	}
 });
 
 /**
