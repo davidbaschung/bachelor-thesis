@@ -188,6 +188,6 @@ async function cleanUnusedRooms() {
         }
     }
     console.log("Server cleaning : ",transferMetaDataMap.size," active rooms. Deleted ",deleted," unused rooms.");
-    try { await new Promise((resolve => setTimeout(resolve,SECONDSPERTEST*1000))); } catch (error) { console.log(error) };
+    await new Promise((resolve => setTimeout(resolve,SECONDSPERTEST*1000)));
     cleanUnusedRooms();
 }

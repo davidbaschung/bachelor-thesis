@@ -180,7 +180,7 @@ socket.on("transferStatus", function (newStatus) {
 	updateTransferStatus(false, newStatus+"% uploaded", true);
 	if (newStatus.includes("100")) {
 		setResetButtonLabel("reset");
-		updateTransferStatus(false, newStatus+"% uploaded<br/>Try our desktop App!<br/>↓", true);
+		updateTransferStatus(false, newStatus+"% uploaded<br/>Try our desktop app!<br/>↓", true);
 	}
 });
 
