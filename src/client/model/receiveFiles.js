@@ -23,7 +23,7 @@ function receiveChunks(loadOfChunks) {
     var file = filesToReceive[filesToReceiveCount];
     var length = loadOfChunks.byteLength;
     totalReceivedSize += length;
-    var newStatus = (totalReceivedSize/totalSizeToReceive*100).toFixed(2);
+    var newStatus = (totalReceivedSize/totalSizeToReceive*100).toFixed(3);
     if (updateTransferStatus(true, newStatus+"% downloaded", false)) {
         socket.emit("transferStatus", newStatus, currentSenderID);
     }

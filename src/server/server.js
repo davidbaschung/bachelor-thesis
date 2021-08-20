@@ -163,7 +163,6 @@ io.on("connection", function (socket) {
 
     /* Used for socket aliveness verification to remove dead connections */
     socket.on("pong", function (receiverCode) {
-        // console.log("pong from ",socket.id," with code ",receiverCode);
         var transferMetaData = transferMetaDataMap.get(receiverCode);
         if (transferMetaData == undefined) return;
         transferMetaData.hostResponded = true;
