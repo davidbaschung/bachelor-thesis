@@ -41,7 +41,7 @@ async function sendFileAsync(file) {
                 await asyncSleep(100);
             var fileLookupIncrementingSize = 0;
             filesToSendCount = 0;
-            while (fileLookupIncrementingSize + filesToSend[filesToSendCount] <= securedSize) {
+            while (fileLookupIncrementingSize + filesToSend[filesToSendCount].size <= securedSize) {
                 fileLookupIncrementingSize += filesToSend[filesToSendCount];
                 filesToSendCount++;
             }            

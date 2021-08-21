@@ -72,7 +72,6 @@ io.on("connection", function (socket) {
      */
     socket.on('joinRoom', function(inputedCode) {
         var transferMetaData = transferMetaDataMap.get(inputedCode);
-        if (transferMetaData == undefined) return;
         var accepted = false;
         if (transferMetaData != undefined) accepted = true;
         console.log((accepted?"Correct":"Wrong")+" code ("+inputedCode+") received by socket "+socket.id+", request "+(accepted?"accepted":"refused")+".");
