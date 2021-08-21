@@ -2,7 +2,7 @@ console.log("SendFiles script loaded");
 const BYTESPERCHUNK = 16000;        /* Bytes size for loading and queuing in buffer     */
 const MAXBUFFEREDAMOUNT = 16000000; /* Buffer max size, for Chrome                      */
 var filesToSendCount = 0;           /* Increment for files counting                     */
-var securedSize = 0;                /*   The data size successfully transmitted         */
+var securedSize = 0;                /* The data size successfully transmitted           */
 
 /**
  * Begins sending of all files.
@@ -21,6 +21,7 @@ function sendFilesAsync() {
 async function sendFileAsync(file) {
     if (senderDataChannel == null || file == undefined) return;
     console.log("Sending of file "+file.name+" begins");
+    var currentFile = file;  /* current file might have to change to a previous file in case of connection loss */
     var offset = 0;
     var reader = new FileReader();
     /**
@@ -39,16 +40,22 @@ async function sendFileAsync(file) {
         if ( ! readyForSending) {   /* When the loading stream is interrupted by connection loss (through kill-switch) */
             while ( ! readyForSending)
                 await asyncSleep(100);
-            offset = securedSize;
+            var fileLookupIncrementingSize = 0;
+            filesToSendCount = 0;
+            while (fileLookupIncrementingSize + filesToSend[filesToSendCount] <= securedSize) {
+                fileLookupIncrementingSize += filesToSend[filesToSendCount];
+                filesToSendCount++;
+            }            
+            offset = securedSize - fileLookupIncrementingSize;
             readNextSlice();
             return;
         }
         senderDataChannel.send(result);
         offset += result.byteLength;
-        if (offset < file.size) {
+        if (offset < currentFile.size) {
             readNextSlice();
         } else {
-            sendFilesAsyncCallback(file);
+            sendFilesAsyncCallback(currentFile);
         }
     };
     reader.onerror = (error) => {
@@ -59,7 +66,7 @@ async function sendFileAsync(file) {
 
     /* Internal loading of a file data chunk from the hard drive. */
     function readNextSlice() {
-        var slice = file.slice(offset, offset + BYTESPERCHUNK);
+        var slice = currentFile.slice(offset, offset + BYTESPERCHUNK);
         reader.readAsArrayBuffer(slice);
     }
     readNextSlice(); /* loading initialization */
