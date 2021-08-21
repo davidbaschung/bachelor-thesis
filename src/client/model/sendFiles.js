@@ -21,7 +21,6 @@ function sendFilesAsync() {
 async function sendFileAsync(file) {
     if (senderDataChannel == null || file == undefined) return;
     console.log("Sending of file "+file.name+" begins");
-    var currentFile = file;  /* current file might have to change to a previous file in case of connection loss */
     var offset = 0;
     var reader = new FileReader();
     /**
@@ -52,10 +51,10 @@ async function sendFileAsync(file) {
         }
         senderDataChannel.send(result);
         offset += result.byteLength;
-        if (offset < currentFile.size) {
+        if (offset < filesToSend[filesToSendCount].size) {
             readNextSlice();
         } else {
-            sendFilesAsyncCallback(currentFile);
+            sendFilesAsyncCallback(filesToSend[filesToSendCount]);
         }
     };
     reader.onerror = (error) => {
@@ -66,7 +65,7 @@ async function sendFileAsync(file) {
 
     /* Internal loading of a file data chunk from the hard drive. */
     function readNextSlice() {
-        var slice = currentFile.slice(offset, offset + BYTESPERCHUNK);
+        var slice = filesToSend[filesToSendCount].slice(offset, offset + BYTESPERCHUNK);
         reader.readAsArrayBuffer(slice);
     }
     readNextSlice(); /* loading initialization */
@@ -93,7 +92,7 @@ function resetFilesSending() {
     filesToSendCount = 0;
 }
 
-/* Restores the recovered data from the DataChannel buffer */
+/* Restores the lost DataChannel */
 async function restoreDataChannel() {
     readyForSending = true;
 }
