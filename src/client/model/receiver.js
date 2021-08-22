@@ -202,7 +202,7 @@ function iceConnectionStateChange_B(event) {
 			if (count < MAXSECONDSFORLOSTCONNECTION) {
 				if (count>10 && count%5==0) {
 					if (count%30==0)
-						console.log("RTC+Socket : connection lost, ", count==0?"":"still" ," attempting reconnection.");
+						console.log("RTC+Socket : connection lost, ", count==15?"":"still" ," attempting reconnection.");
 					if (socket.connected) {
 						console.log("Socket reconnected, preparing P2P connection");
 						socket.emit("restoreConnection", getInput(true), false);

@@ -127,9 +127,10 @@ socket.on("answerSDP", function (answerSDP) {
  * @param {RTCPeerConnectionIceEvent} event - Networking ICE event, contains an RTCIceCandidate
  */
 async function onIceCandidateRTC_A(event) {
-	if (senderConnection == null) return;
-	while (senderConnection.remoteDescription==undefined)
+	do {
+		if (senderConnection == null) return;
 		await asyncSleep(50);
+	} while (senderConnection.remoteDescription==undefined);
 	console.log("RTC : IceCandidateA created, it will be sent");
 	if (event.candidate) {
 		socket.emit("IceCandidateA", event.candidate, currentReceiverID);
@@ -205,7 +206,7 @@ function iceConnectionStateChange_A(event) {
 			if (count < MAXSECONDSFORLOSTCONNECTION) {
 				if (count>=10 && count%10==0) {
 					if (count%30==0)
-						console.log("RTC+Socket : connection lost, ", count==0?"":"still" ," attempting reconnection.");
+						console.log("RTC+Socket : connection lost, ", count==10?"":"still" ," attempting reconnection.");
 					if (socket.connected) {
 						readyForSending = false;
 						senderDataChannel.close();
