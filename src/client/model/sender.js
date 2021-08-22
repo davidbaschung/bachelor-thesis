@@ -196,22 +196,25 @@ function iceConnectionStateChange_A(event) {
 	 * Reconnection uses a readyForSending flag to authorize/pause sending on dataChannels, then recreates connections.
 	 * @param {Number} count - seconds since the connection was lost
 	 */
-	function checkConnectivity(count) {	
+	async function checkConnectivity(count) {	
 		if (senderConnection==null || senderConnection==undefined)
 			return;
 		console.log("RTC : ICE state : ",event.target.connectionState);
 		var state = senderConnection.iceConnectionState;
-		if ( ! ( state == "connected" ) ) {
+		if ( state != "connected" ) {
 			if (count < MAXSECONDSFORLOSTCONNECTION) {
-				asyncSleep(1000).then(() => {
-					if (count>0 && count%10==0) {
-						console.log("RTC+Socket : connection lost, reconnecting");
+				if (count>=10 && count%10==0) {
+					if (count%30==0)
+						console.log("RTC+Socket : connection lost, ", count==0?"":"still" ," attempting reconnection.");
+					if (socket.connected) {
 						readyForSending = false;
 						senderDataChannel.close();
-						console.log("Socket state : "+socket.connected);
+						console.log("Socket reconnected, preparing P2P connection");
 						socket.emit("restoreConnection", getCodeLabel(true), true);
 						return;
 					}
+				}
+				asyncSleep(1000).then(() => {
 					checkConnectivity(++count);
 				});
 			} else {
@@ -223,4 +226,4 @@ function iceConnectionStateChange_A(event) {
 	checkConnectivity(0);
 }
 /* Host first reconnection after a network failure */
-socket.on("hostReconnected", () => console.log("Reconnected as host"));
+socket.on("hostReconnected", () => console.log("Socket : Reconnected as host"));

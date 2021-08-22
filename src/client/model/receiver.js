@@ -198,13 +198,17 @@ function iceConnectionStateChange_B(event) {
 			return;
 		console.log("RTC : ICE state : ",event.target.connectionState);
 		var state = receiverConnection.iceConnectionState;
-		if ( ! ( state == "connected" ) ) {
+		if ( state != "connected" ) {
 			if (count < MAXSECONDSFORLOSTCONNECTION) {
-				asyncSleep(3000).then(() => {
-					if (count>=10 && count%5==0) {
+				if (count>10 && count%5==0) {
+					if (count%30==0)
+						console.log("RTC+Socket : connection lost, ", count==0?"":"still" ," attempting reconnection.");
+					if (socket.connected) {
+						console.log("Socket reconnected, preparing P2P connection");
 						socket.emit("restoreConnection", getInput(true), false);
-						console.log("Socket state : "+socket.connected);
 					}
+				}
+				asyncSleep(1000).then(() => {
 					checkConnectivity(++count);
 				});
 			} else {
