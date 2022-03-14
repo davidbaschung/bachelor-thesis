@@ -9,4 +9,4 @@
   <li>NodeJS and Express usage</li>
 </ul>
 
-![Diagram](https://user-images.githubusercontent.com/29238761/158183578-78ec4c97-d6f4-4a7b-9e30-a838ed84af7c.jpg)
+![Diagram Light](https://user-images.githubusercontent.com/29238761/158183732-2be42416-e175-4dbf-99b3-bc46187e6053.jpg)
