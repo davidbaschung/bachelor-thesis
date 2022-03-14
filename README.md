@@ -6,7 +6,7 @@
 <h3>What I learned</h3>
 <ul>
   <li>WebRTC framework</li>
-  <li>NodeJS and Express usage</li>
+  <li>NodeJS, Express and Heroku usage</li>
 </ul>
 
 ![Diagram Light](https://user-images.githubusercontent.com/29238761/158183732-2be42416-e175-4dbf-99b3-bc46187e6053.jpg)
